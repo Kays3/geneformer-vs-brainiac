@@ -8,7 +8,7 @@ This folder starts a new project: one model of the larval zebrafish brain that j
 
 Web page of this introduction: <https://claude.ai/artifact/4hozJekQgTHWnEeZTGN9VC> (private until shared; the source is `artifact/intro.html`).
 
-**Status: a plan.** No data are downloaded, no model is trained and there are no results. The dependencies resolve and one small workflow, the stage 0 inventory, runs (see [SETUP.md](SETUP.md)).
+**Status: a plan.** No data are downloaded, no model is trained and there are no results. The environment installs and one small workflow, the stage 0 inventory, runs (see [SETUP.md](SETUP.md)).
 
 Two further plans build on this page:
 

@@ -1,6 +1,6 @@
 # Setup
 
-What is checked, on macOS on 15 November 2026: the dependency list in `pyproject.toml` resolves (`uv.lock`), and the stage 0 workflow runs with Neuro-Workflow alone installed. The full `uv sync`, which also installs `torch` and `scanpy`, is untested. So are downloading and training.
+What is checked, on 15 November 2026 on a Linux aarch64 GPU machine, from a fresh clone at commit `464fd11`: `uv sync` completes (about 26 seconds, 6.2 GB environment), `scanpy` 1.12.6 and `torch` 2.15.0 import, `torch` sees the GPU, and the stage 0 workflow runs and reports 0 ready and 8 blocked. Downloading data and training are untested. On macOS only the dependency resolution was checked.
 
 ## 1. Environment
 
