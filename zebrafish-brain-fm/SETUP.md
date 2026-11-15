@@ -19,6 +19,13 @@ Then run the first workflow. It reads the manifest and lists the data sets that 
 uv run python workflows/stage0_inventory.py
 ```
 
+The smallest model can be trained on synthetic cells as a smoke test. It took about three minutes on one GPU; `--tiny` takes seconds on any machine:
+
+```bash
+uv run python workflows/tier_s_smoke.py --tiny
+uv run python workflows/tier_s_smoke.py --steps 300
+```
+
 `neuroworkflow` is installed from its GitHub repository, which is large; the first install can be slow. The other packages are `anndata` and `scanpy` for single-cell tables, `torch` and `transformers` for the model, and `datasets` for tokenized cells. Image packages come with stage 4.
 
 ## 2. Folders

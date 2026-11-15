@@ -1,1 +1,3 @@
 date	stage	run	hardware	gpu_hours	stage_ceiling_gpu_hours	output_check	notes
+2026-11-15	smoke	tier-s-smoke attempt 1 (600 steps)	NVIDIA GB10	0.002	0.1	not started	Start check projected 394 s against the 360 s ceiling; 10 timed steps only (code c12ecb6)
+2026-11-15	smoke	tier-s-smoke attempt 2 (300 steps)	NVIDIA GB10	0.049	0.1	passed: losses finite, held-out loss below both baselines, 300 of 300 steps	177.9 s of training (code 3058bb2); compute/runs/tier-s-smoke-20261115.json

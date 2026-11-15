@@ -61,3 +61,31 @@ With about 710,000 cells, tier L on zebrafish alone is likely to overfit. Tier L
 - Seconds per gene screen in stage 3, from three timed screens.
 
 The tiers, the rules and the assumptions are the author's proposal.
+
+## First measurement: the tier S smoke test (15 November 2026)
+
+The smallest model was trained on **synthetic cells**, to check that the nodes run and to get a first timing. The cells are random type profiles plus noise. The result says nothing about zebrafish.
+
+Run it with `uv run python workflows/tier_s_smoke.py --steps 300`. The full record is [`compute/runs/tier-s-smoke-20261115.json`](compute/runs/tier-s-smoke-20261115.json).
+
+| Quantity | Value |
+|---|---|
+| Model | 4 layers, width 128: 4,895,616 weights (the table above says about 5 M) |
+| Data | 9,000 training cells, 1,000 held-out cells, 30,000 gene tokens, 2,048 genes per cell |
+| Hardware and precision | One NVIDIA GB10, fp32 |
+| Steps | 300 of 300, batch of 32 cells |
+| Time | 177.9 s: 1.69 steps per second, about 110,500 tokens per second |
+| Peak GPU memory | 11.35 GB |
+| Held-out loss | 9.916 |
+| Baseline: gene frequency | 10.127 |
+| Baseline: uniform | 10.309 |
+
+What it shows:
+
+- The model beats both baselines on held-out cells after 300 steps. The margin is small, and the data are synthetic.
+- The start check works. The first attempt, at 600 steps, projected 394 s against the 360 s ceiling and did not start. The ceiling was kept and the steps were halved. Both attempts are in the ledger: 0.051 of 0.1 GPU-hours.
+- At this speed, one pass over 1.45 billion tokens with the tier S model would take about 3.7 hours on this GPU (1.45 billion / 110,500 per second). This is arithmetic from one short run, on synthetic cells of full length.
+
+What it does not show: anything about real cells, the tier M model, a second seed, or the permuted-label control.
+
+In this test the start check sits inside the training node. The plan above asks for a separate start-check node; that is still to do.

@@ -8,7 +8,7 @@ This folder starts a new project: one model of the larval zebrafish brain that j
 
 Web page of this introduction: <https://claude.ai/artifact/4hozJekQgTHWnEeZTGN9VC> (private until shared; the source is `artifact/intro.html`).
 
-**Status: a plan.** No data are downloaded, no model is trained and there are no results. The environment installs and one small workflow, the stage 0 inventory, runs (see [SETUP.md](SETUP.md)).
+**Status: a plan.** No real data are downloaded and there are no results about zebrafish. The environment installs, the stage 0 inventory runs, and the smallest model has been trained once on synthetic cells as a smoke test (see [SETUP.md](SETUP.md) and [GPU-AND-SCALE.md](GPU-AND-SCALE.md)).
 
 Two further plans build on this page:
 
