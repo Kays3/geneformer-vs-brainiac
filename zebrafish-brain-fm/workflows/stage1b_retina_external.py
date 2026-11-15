@@ -81,6 +81,8 @@ def build(argv=()):
 def main():
     builder, n = build(sys.argv)
     success = builder.build().execute()
+    if not success:
+        sys.exit("The workflow failed: a node raised an error. See the messages above.")
     data = torch.load(n["tokenizer"].get_output("tokens_path"))
     truth = data["cell_type"].numpy()[data["is_heldout"].numpy()]
     pred = {k: np.load(probe.get_output("predictions_path")) for k, probe in n["probes"].items()}

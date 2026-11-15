@@ -12,6 +12,7 @@ from pathlib import Path
 
 import anndata as ad
 import numpy as np
+import pandas as pd
 import torch
 from datasets import load_from_disk
 from geneformer import TranscriptomeTokenizer
@@ -30,14 +31,15 @@ work = out.parent / (out.stem + "_work")
 shutil.rmtree(work, ignore_errors=True)
 (work / "input").mkdir(parents=True)
 
-adata = ad.read_h5ad(args.input)
-n_cells = adata.n_obs
-adata.var["ensembl_id"] = adata.var_names.astype(str)
-adata.var = adata.var[["ensembl_id"]]
-adata.obs = adata.obs[[]].copy()
-adata.obs["n_counts"] = np.asarray(adata.X.sum(axis=1)).ravel().astype(float)
-adata.obs["cell_index"] = np.arange(n_cells)
-adata.write_h5ad(work / "input" / "cells.h5ad")
+source = ad.read_h5ad(args.input)
+n_cells = source.n_obs
+# Rebuild the tables with plain string indexes: this environment's anndata does not
+# write the string type that the project environment's pandas produces.
+genes = np.array([str(g) for g in source.var_names], dtype=object)
+obs = pd.DataFrame({"n_counts": np.asarray(source.X.sum(axis=1)).ravel().astype(float), "cell_index": np.arange(n_cells)},
+                   index=pd.Index([str(i) for i in range(n_cells)], dtype=object))
+var = pd.DataFrame({"ensembl_id": genes}, index=pd.Index(genes, dtype=object))
+ad.AnnData(X=source.X, obs=obs, var=var).write_h5ad(work / "input" / "cells.h5ad")
 
 tokenizer = TranscriptomeTokenizer(custom_attr_name_dict={"cell_index": "cell_index"}, nproc=4, model_version="V2")
 tokenizer.tokenize_data(data_directory=str(work / "input"), output_directory=str(work / "tokens"),
