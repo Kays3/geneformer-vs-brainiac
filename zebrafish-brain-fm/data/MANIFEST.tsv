@@ -1,0 +1,9 @@
+layer	dataset	reference_doi	local_path	sha256	licence	stage_used
+single_cell	Raj 2020 brain atlas	10.1016/j.neuron.2020.09.023				1
+single_cell	Daniocell	10.1016/j.devcel.2023.11.001				1
+single_cell	Zebrahub	10.1016/j.cell.2024.09.047				1
+architecture	mapzebrain atlas	10.1016/j.neuron.2019.04.034				2
+architecture	mapzebrain gene expression	10.1126/sciadv.ade9909				2
+architecture	Z-Brain	10.1038/nmeth.3581				2
+functional_genomics	DANIO-CODE	10.1038/s41588-022-01089-w				3
+functional_genomics	Thyme 2019 mutants	10.1016/j.cell.2019.01.048				3

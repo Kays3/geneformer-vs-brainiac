@@ -43,6 +43,10 @@ It is not a head-to-head. The two models share no data, no task and no metric. N
 - [ ] Do the same on public data with Geneformer, starting from [geneformer-petadimension-starter](https://github.com/Kays3/geneformer-petadimension-starter).
 - [ ] Choose a licence for this repository. It has none yet.
 
+## New project: a zebrafish brain model
+
+[`zebrafish-brain-fm/`](zebrafish-brain-fm/) starts a model of the larval zebrafish brain that joins single-cell data, brain architecture and functional genomics. It holds the [introduction](zebrafish-brain-fm/README.md), the [setup](zebrafish-brain-fm/SETUP.md) and a data manifest. It is a plan: nothing is trained yet.
+
 ## Rebuild the video
 
 Needs macOS (for the `say` voice and the Arial font) and [uv](https://docs.astral.sh/uv/).
