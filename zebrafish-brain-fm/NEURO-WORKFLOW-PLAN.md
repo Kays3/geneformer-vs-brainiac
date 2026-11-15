@@ -6,7 +6,25 @@ Read at commit `3a4b03b6` (14 November 2026). Neuro-Workflow is not yet publishe
 
 ## What is checked
 
-One workflow runs: [`workflows/stage0_inventory.py`](workflows/stage0_inventory.py) connects two nodes from [`nodes/`](nodes/), reads the data manifest and reports which data sets may be used. On 15 November 2026 it ran to the end and reported 0 ready and 8 blocked, which is correct for an empty manifest. Nothing else in this plan has been run.
+Two workflows run, each a graph of two nodes from [`nodes/`](nodes/). [nodes/README.md](nodes/README.md) is the reference for both.
+
+[`workflows/stage0_inventory.py`](workflows/stage0_inventory.py) reads the data manifest and reports which data sets may be used. On 15 November 2026 it reported 0 ready and 8 blocked, which is correct for an empty manifest.
+
+```mermaid
+flowchart LR
+    M["ManifestLoaderNode<br/>stage: io"] -->|"rows: LIST"| C["ManifestCheckNode<br/>stage: analysis"]
+    C --> O["ready: LIST<br/>blocked: DICT"]
+```
+
+[`workflows/tier_s_smoke.py`](workflows/tier_s_smoke.py) trains the smallest model on synthetic cells. It ran on 15 November 2026 on one GPU; the numbers are in [GPU-AND-SCALE.md](GPU-AND-SCALE.md).
+
+```mermaid
+flowchart LR
+    S["SyntheticCellsNode<br/>stage: io"] -->|"data_path: STR"| T["TierSTrainNode<br/>stage: training, proposed"]
+    T --> O["metrics: DICT<br/>checkpoint_path: STR"]
+```
+
+Nothing else in this plan has been run.
 
 ## Why use it
 
@@ -27,10 +45,28 @@ Neuro-Workflow's stage list is `io`, `neuron`, `population`, `synapse`, `connect
 | 4 Image encoder | Stack loader; 3D encoder training | `io`, then see the gap below |
 | Later: simulation | Region wiring from the atlas to a TVB connectome; whole-brain simulation; comparison with measured activity maps | `connectivity`, `simulation`, `analysis` |
 
+The stage 1 workflow, as planned. No node in this graph exists yet. The result branch and the baseline branch read the same held-out split, so the comparison is part of the graph.
+
+```mermaid
+flowchart TD
+    L["Atlas loader<br/>io"] --> SP["Split by animal<br/>analysis"]
+    SP -->|"training cells"| TK["Rank tokenizer"]
+    SP -->|"held-out cells"| TK
+    TK --> SC["Start check"]
+    SC -->|"projected time under the ceiling"| TR["Encoder training"]
+    TR -->|"checkpoint path"| EM["Embedding"]
+    EM --> CL["Held-out classifier"]
+    SP -->|"same split"| PC["Principal components"]
+    PC --> BL["Baseline classifier"]
+    CL --> CMP["Comparison and report"]
+    BL --> CMP
+    TR --> LG["Ledger row"]
+```
+
 ## Gaps to settle first
 
-1. **No stage for machine learning.** Tokenizing, pretraining and fine-tuning match none of the nine stages. The node guide allows a new stage to be proposed. Decide the names (for example `representation` and `training`) and ask the Neuro-Workflow maintainers before many nodes exist.
-2. **Long GPU runs inside a node are untried here.** The library describes itself as an in-memory workflow library. A training node should launch and watch a job and return a path to a checkpoint. It should not hold the model in a port. See [GPU-AND-SCALE.md](GPU-AND-SCALE.md).
+1. **No stage for machine learning.** Tokenizing, pretraining and fine-tuning match none of the nine stages. The node guide allows a new stage to be proposed. Decide the names (for example `representation` and `training`) and ask the Neuro-Workflow maintainers before many nodes exist. The smoke-test training node already uses `stage="training"`; the library ran it without complaint, but the name is not agreed.
+2. **Long GPU runs inside a node are untried here.** The only GPU run so far lasted three minutes. The library describes itself as an in-memory workflow library. A training node should launch and watch a job and return a path to a checkpoint. It should not hold the model in a port. See [GPU-AND-SCALE.md](GPU-AND-SCALE.md).
 3. **Large data on ports.** Ports carry Python objects. Atlases of hundreds of thousands of cells should pass as file paths with a sha256, not as arrays.
 4. **Licence.** Neuro-Workflow is under PolyForm Noncommercial 1.0.0. This project depends on it as an installed package and copies none of its code. Choose this repository's own licence with that in mind.
 5. **Where nodes live.** Nodes stay in this repository's `nodes/` folder. Offering them to the Neuro-Workflow node library is a later, separate decision.

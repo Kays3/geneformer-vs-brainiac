@@ -34,7 +34,7 @@ These are working questions for evaluating a foundation model. They are not find
 
 ## What the comparison cannot say
 
-It is not a head-to-head. The two models share no data, no task and no metric. Nothing here was run: no BrainIAC or Geneformer result in this repository was produced by the author.
+It is not a head-to-head. The two models share no data, no task and no metric. Neither model was run for it: no BrainIAC or Geneformer result in this repository was produced by the author.
 
 ## Next steps
 
@@ -43,9 +43,21 @@ It is not a head-to-head. The two models share no data, no task and no metric. N
 - [ ] Do the same on public data with Geneformer, starting from [geneformer-petadimension-starter](https://github.com/Kays3/geneformer-petadimension-starter).
 - [ ] Choose a licence for this repository. It has none yet.
 
+## What is in this repository
+
+```mermaid
+flowchart TD
+    R["geneformer-vs-brainiac"] --> C["Comparison<br/>README, SOURCES, make_video.py"]
+    R --> Z["zebrafish-brain-fm/"]
+    C --> V["Video, in the v0.1 release"]
+    Z --> P["Plans<br/>introduction, Neuro-Workflow, GPU and scale"]
+    Z --> N["nodes/ and workflows/<br/>four nodes, two workflows"]
+    Z --> K["Records<br/>data manifest, GPU ledger, run summaries"]
+```
+
 ## New project: a zebrafish brain model
 
-[`zebrafish-brain-fm/`](zebrafish-brain-fm/) starts a model of the larval zebrafish brain that joins single-cell data, brain architecture and functional genomics. It holds the [introduction](zebrafish-brain-fm/README.md), the [setup](zebrafish-brain-fm/SETUP.md), a plan to build it on [Neuro-Workflow](zebrafish-brain-fm/NEURO-WORKFLOW-PLAN.md), a plan for [GPU use and scale](zebrafish-brain-fm/GPU-AND-SCALE.md) and a data manifest. It is a plan: nothing is trained yet.
+[`zebrafish-brain-fm/`](zebrafish-brain-fm/) starts a model of the larval zebrafish brain that joins single-cell data, brain architecture and functional genomics. It holds the [introduction](zebrafish-brain-fm/README.md), the [setup](zebrafish-brain-fm/SETUP.md), a plan to build it on [Neuro-Workflow](zebrafish-brain-fm/NEURO-WORKFLOW-PLAN.md), a plan for [GPU use and scale](zebrafish-brain-fm/GPU-AND-SCALE.md) and a data manifest. It is a plan. The only training so far is a smoke test of the smallest model on synthetic cells.
 
 ## Rebuild the video
 

@@ -32,6 +32,13 @@ A transformer layer of width d has about 12 d² weights. The gene embedding adds
 | M | All zebrafish cells | One GPU | The first real model | It beats the baseline on held-out animals, and the permuted-label run fails as it should |
 | L | Zebrafish plus other species through orthologs | Several GPUs or a cluster | Test whether more data helps | Tier M has passed, and the ortholog map is validated |
 
+```mermaid
+flowchart LR
+    S["Tier S<br/>10,000 cells, about 5 M weights<br/>laptop or one GPU"] -->|"every node and test runs end to end"| M["Tier M<br/>all zebrafish cells, about 12 M<br/>one GPU"]
+    M -->|"beats the baseline on held-out animals<br/>and the permuted-label run fails"| L["Tier L<br/>several species, about 53 M<br/>several GPUs"]
+    M -->|"baseline wins"| X["Report it. No tier L."]
+```
+
 With about 710,000 cells, tier L on zebrafish alone is likely to overfit. Tier L is for the cross-species question, not for a larger zebrafish-only model.
 
 ## Rules for GPU use
@@ -44,6 +51,24 @@ With about 710,000 cells, tier L on zebrafish alone is likely to overfit. Tier L
 6. **One job at a time** on a GPU, with checkpoints so that a stopped run resumes.
 7. **Precision.** Mixed precision is acceptable for training. For gene removal in stage 3, use full precision until a comparison on a sample of genes shows that reduced precision gives the same shifts.
 8. **Seeds.** Repeat one training run with a second seed before reading any difference between models.
+
+The path of one GPU run under these rules:
+
+```mermaid
+flowchart TD
+    A["Ceiling set for the stage"] --> B["Start check: time a few steps"]
+    B --> C{"Projected total over the ceiling?"}
+    C -->|"yes"| D["Run does not start"]
+    C -->|"no"| E["Train, with checkpoints"]
+    E --> F{"Ceiling reached during the run?"}
+    F -->|"yes"| G["Runner stops itself"]
+    F -->|"no"| H["Output check"]
+    G --> H
+    H --> I{"Outputs finite, varied, complete?"}
+    I -->|"yes"| J["Ledger row: passed"]
+    I -->|"no"| K["Ledger row: failed. Hours still count."]
+    D --> L["Ledger row: not started"]
+```
 
 ## GPU work inside Neuro-Workflow
 

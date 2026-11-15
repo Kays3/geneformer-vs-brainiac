@@ -10,14 +10,46 @@ Web page of this introduction: <https://claude.ai/artifact/4hozJekQgTHWnEeZTGN9V
 
 **Status: a plan.** No real data are downloaded and there are no results about zebrafish. The environment installs, the stage 0 inventory runs, and the smallest model has been trained once on synthetic cells as a smoke test (see [SETUP.md](SETUP.md) and [GPU-AND-SCALE.md](GPU-AND-SCALE.md)).
 
-Two further plans build on this page:
+## Documents
 
-- [NEURO-WORKFLOW-PLAN.md](NEURO-WORKFLOW-PLAN.md): Neuro-Workflow as the main architecture, with every step a schema-defined node.
-- [GPU-AND-SCALE.md](GPU-AND-SCALE.md): model sizes, three tiers of scale and the rules for GPU use.
+| Read | For |
+|---|---|
+| This page | The idea, the data sources, the stages and their tests |
+| [SETUP.md](SETUP.md) | Installing, the first commands, working across machines |
+| [NEURO-WORKFLOW-PLAN.md](NEURO-WORKFLOW-PLAN.md) | The architecture: every step a schema-defined node |
+| [nodes/README.md](nodes/README.md) | Reference for each node and workflow that exists now |
+| [GPU-AND-SCALE.md](GPU-AND-SCALE.md) | Model sizes, the three tiers, GPU rules, the first measurement |
+| [data/MANIFEST.tsv](data/MANIFEST.tsv) | One row per data set: path, sha256, licence |
+| [compute/gpu-ledger.tsv](compute/gpu-ledger.tsv) | One row per GPU run |
 
 ## The idea in one paragraph
 
 The three kinds of data do not share cells or animals. They share **genes**. A single-cell atlas gives the expression of each gene in each cell. A brain atlas gives maps of marker genes in each region. A mutant collection gives, for each gene, the brain regions that change when the gene is lost. So the gene identifier is the key that joins the layers, and the model is built and tested around that key.
+
+```mermaid
+flowchart TD
+    subgraph CELLS["Single cells"]
+        c1["Raj 2020 brain atlas"]
+        c2["Daniocell"]
+        c3["Zebrahub"]
+    end
+    subgraph ARCH["Brain architecture"]
+        a1["mapzebrain regions and neurons"]
+        a2["mapzebrain marker gene maps"]
+        a3["Z-Brain"]
+    end
+    subgraph FUNC["Functional genomics"]
+        f1["DANIO-CODE regulatory elements"]
+        f2["Mutants of 132 genes"]
+    end
+    KEY{{"Shared key: the gene identifier"}}
+    CELLS -->|"expression per cell"| KEY
+    ARCH -->|"marker gene per region"| KEY
+    FUNC -->|"regions changed per mutated gene"| KEY
+    KEY --> S1["Stage 1: cell encoder"]
+    KEY --> S2["Stage 2: cells into the brain"]
+    KEY --> S3["Stage 3: gene removed in the model"]
+```
 
 ## The three layers and their public sources
 
@@ -53,6 +85,17 @@ Each stage has a simple baseline. If the baseline wins, the stage reports that.
 | 2 | Cells into the brain: predict the region of a cell from its expression, through the marker gene maps | Regions of cell types with known positions | Random marker sets of the same size |
 | 3 | Functional genomics: remove a gene in the model and predict which regions change | The 132 mutants: predicted regions against the measured maps | Expression-matched random genes |
 | 4 | Image encoder for registered brain stacks, in the manner of BrainIAC | To be set after stage 2 | To be set |
+
+Every stage passes the same gate before the next one starts:
+
+```mermaid
+flowchart LR
+    W["Stage work"] --> T["Test on held-out data"]
+    T --> Q{"Better than the baseline or null?"}
+    Q -->|"yes"| N["Next stage"]
+    Q -->|"no"| R["Report that the baseline wins"]
+    R --> D["Revise the stage or stop"]
+```
 
 Stage 3 is the reason to combine the layers. The mutant collection is a set of measured answers, so an in silico perturbation can be scored against an experiment and against random genes.
 

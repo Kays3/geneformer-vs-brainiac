@@ -38,9 +38,11 @@ zebrafish-brain-fm/
   uv.lock            resolved versions
   NEURO-WORKFLOW-PLAN.md  the node architecture
   GPU-AND-SCALE.md   tiers, model sizes, GPU rules
-  nodes/             Neuro-Workflow nodes of this project
+  nodes/             Neuro-Workflow nodes of this project, with a reference README
   workflows/         one script per workflow
   compute/gpu-ledger.tsv  one row per GPU run
+  compute/runs/      one summary per GPU run
+  runs/              checkpoints and full metrics (not in git)
   data/MANIFEST.tsv  one row per data set: source, path, sha256, licence
   data/raw/          downloads (not in git)
   data/derived/      tokenized cells, region tables (not in git)
@@ -68,6 +70,35 @@ A data set with an empty licence cell is not used.
 - [ ] Write the stage 1 test and its baseline before any training.
 - [ ] Decide where training runs, and how much compute stage 1 may use.
 
-## 5. Hardware
+## 5. Working across machines
+
+Code moves through git only. Large files stay on the machine that made them.
+
+```mermaid
+sequenceDiagram
+    participant L as Laptop
+    participant G as GitHub
+    participant M as GPU machine
+    L->>G: push a working branch
+    M->>G: pull the branch
+    M->>M: uv sync, start check, run
+    M-->>L: metrics printed by the workflow
+    L->>L: write the run summary and the ledger row
+    L->>G: merge into main and push
+    M->>G: pull main
+    Note over L,M: All three now show the same commit
+    Note over M: Checkpoints, data and the environment stay here, outside git
+```
+
+- Write and review on the laptop. Do not run `uv sync` or `uv run` there unless you want the full environment on it: the install includes PyTorch and a large clone of Neuro-Workflow.
+- Run on the GPU machine from a clean clone, so that the commit in the run summary is the code that ran.
+- A run summary in `compute/runs/` carries the commit, the command and the first 16 characters of the checkpoint's sha256. That is the link between git and the files that are not in git.
+- After a run, check that all three copies agree: `git status -sb` and `git log --oneline -1` on each.
+
+| In git | Not in git |
+|---|---|
+| Code, plans, the manifest, the ledger, run summaries | `data/raw/`, `data/derived/`, `runs/` (checkpoints and full metrics), `.venv/` |
+
+## 6. Hardware
 
 Stage 0 and small checks run on a laptop. Model training needs a GPU machine. The compute for stage 1 is not estimated yet. [GPU-AND-SCALE.md](GPU-AND-SCALE.md) gives the tiers and the rules, including the timed start check before any full run.

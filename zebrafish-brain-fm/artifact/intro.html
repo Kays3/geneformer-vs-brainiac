@@ -62,7 +62,7 @@ pre { margin: 0; background: var(--surface); border: 1px solid var(--line); bord
   <span class="eyebrow">Project introduction · <i>Danio rerio</i>, larval brain</span>
   <h1>A foundation model of the zebrafish brain</h1>
   <p class="lede">One model that joins what each cell expresses, where cells sit in the brain, and what happens when a gene is removed.</p>
-  <p class="status"><strong>Status: a plan.</strong> No data are downloaded, no model is trained and there are no results. The dependencies resolve and one small workflow, the stage 0 inventory, runs.</p>
+  <p class="status"><strong>Status: a plan.</strong> No real data are downloaded and there are no results about zebrafish. The environment installs, the stage 0 inventory runs, and the smallest model has been trained once on synthetic cells as a smoke test.</p>
 </section>
 
 <section>
@@ -185,6 +185,41 @@ pre { margin: 0; background: var(--surface); border: 1px solid var(--line); bord
     <li>Time a short run first. If the projected total exceeds the ceiling, the full run does not start.</li>
     <li>Check the output of a run before recording it as done.</li>
     <li>Stage 3 runs 2,772 gene screens: 132 mutated genes, each with 20 matched random genes.</li>
+  </ul>
+  <figure>
+    <div class="scroll"><pre class="mermaid">flowchart TD
+    A["Ceiling set for the stage"] --> B["Start check: time a few steps"]
+    B --> C{"Projected total over the ceiling?"}
+    C -->|"yes"| D["Run does not start"]
+    C -->|"no"| E["Train, with checkpoints"]
+    E --> H["Output check"]
+    H --> I{"Outputs finite, varied, complete?"}
+    I -->|"yes"| J["Ledger row: passed"]
+    I -->|"no"| K["Ledger row: failed. Hours still count."]
+    D --> L["Ledger row: not started"]</pre></div>
+    <figcaption>The path of one GPU run. Every branch ends in a ledger row.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>First measurement</h2>
+  <p>The smallest model was trained on synthetic cells, random type profiles plus noise, to check that the nodes run and to get a first timing. It says nothing about zebrafish.</p>
+  <div class="scroll"><table>
+    <tbody>
+      <tr><td>Model</td><td class="num">4 layers, width 128, 4,895,616 weights</td></tr>
+      <tr><td>Data</td><td class="num">9,000 training and 1,000 held-out cells, 2,048 genes per cell</td></tr>
+      <tr><td>Hardware</td><td class="num">one NVIDIA GB10, fp32</td></tr>
+      <tr><td>Time</td><td class="num">300 steps in 177.9 s, about 110,500 tokens per second</td></tr>
+      <tr><td>Peak GPU memory</td><td class="num">11.35 GB</td></tr>
+      <tr><td>Held-out loss</td><td class="num">9.916</td></tr>
+      <tr><td>Baseline: gene frequency</td><td class="num">10.127</td></tr>
+      <tr><td>Baseline: uniform</td><td class="num">10.309</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>The model beats both baselines on held-out cells, by a small margin.</li>
+    <li>The first attempt, at 600 steps, projected 394 s against the 360 s ceiling and did not start. The ceiling was kept and the steps halved.</li>
+    <li>At this speed, one pass over 1.45 billion tokens with this model would take about 3.7 hours on this GPU. That is arithmetic from one short run.</li>
   </ul>
 </section>
 
