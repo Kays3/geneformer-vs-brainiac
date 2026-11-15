@@ -66,6 +66,27 @@ pre { margin: 0; background: var(--surface); border: 1px solid var(--line); bord
 </section>
 
 <section>
+  <h2>Where the work stands</h2>
+  <p class="src">As of 15 November 2026, 06:24 UTC.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>State</th><th>Item</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag a">DONE</span></td><td>Plan and documents</td><td>Introduction, setup, Neuro-Workflow architecture, GPU and scale plan, node reference, eleven diagrams</td></tr>
+      <tr><td><span class="tag a">DONE</span></td><td>Environment</td><td>Installs from a clean clone on a Linux GPU machine in about 26 seconds</td></tr>
+      <tr><td><span class="tag a">DONE</span></td><td>Stage 0 workflow</td><td>Runs. It reports 0 data sets ready and 8 blocked, because no licence is recorded yet</td></tr>
+      <tr><td><span class="tag a">DONE</span></td><td>Tier S smoke test</td><td>4.9 M weights on synthetic cells, 300 steps in 178 s, held-out loss below both baselines</td></tr>
+      <tr><td><span class="tag a">DONE</span></td><td>Tier M calibration</td><td>12.9 M weights, 12 steps: 0.85 steps per second, 14.75 GB peak GPU memory</td></tr>
+      <tr><td><span class="tag f">RUNNING</span></td><td>Tier M timing run</td><td>2,500 steps on synthetic cells under a 60-minute ceiling, started 05:49 UTC. No result yet</td></tr>
+      <tr><td><span class="tag c">NEXT</span></td><td>Record the tier M run</td><td>Check its output, then add the ledger row and the run summary</td></tr>
+      <tr><td><span class="tag c">NEXT</span></td><td>Stage 0 for real</td><td>Read the reuse terms of the eight sources and fill the manifest</td></tr>
+      <tr><td><span class="tag c">NEXT</span></td><td>Neuro-Workflow stage names</td><td>Agree names for tokenizing and training with its maintainers</td></tr>
+      <tr><td><span class="tag c">NOT STARTED</span></td><td>Anything on real cells</td><td>No data downloaded, no zebrafish result, no baseline comparison on real data</td></tr>
+    </tbody>
+  </table></div>
+  <p>GPU time used so far: 0.062 GPU-hours recorded in the ledger (0.051 for the smoke test, 0.011 for the calibration). The running job is not yet counted. The repository is at the same commit on GitHub, the laptop and the GPU machine.</p>
+</section>
+
+<section>
   <h2>Genes join the three layers</h2>
   <p>The three kinds of public data do not share cells or animals. They share genes. So the gene identifier is the key that joins them, and the model is built and tested around it.</p>
   <figure>
@@ -202,7 +223,7 @@ pre { margin: 0; background: var(--surface); border: 1px solid var(--line); bord
 </section>
 
 <section>
-  <h2>First measurement</h2>
+  <h2>First measurement: tier S</h2>
   <p>The smallest model was trained on synthetic cells, random type profiles plus noise, to check that the nodes run and to get a first timing. It says nothing about zebrafish.</p>
   <div class="scroll"><table>
     <tbody>
