@@ -9,6 +9,8 @@ from typing import Any, Dict
 import torch
 from torch import nn
 
+from rank_encoder import RankEncoder, trim
+
 from neuroworkflow.core.node import Node
 from neuroworkflow.core.port import PortType
 from neuroworkflow.core.schema import (
@@ -17,26 +19,6 @@ from neuroworkflow.core.schema import (
     ParameterDefinition,
     PortDefinition,
 )
-
-
-class RankEncoder(nn.Module):
-    """Gene and rank-position embeddings, a transformer encoder, tied output weights."""
-
-    def __init__(self, vocab_size: int, seq_len: int, width: int, layers: int, heads: int):
-        super().__init__()
-        self.mask_id = vocab_size
-        self.gene = nn.Embedding(vocab_size + 1, width)
-        self.rank = nn.Embedding(seq_len, width)
-        layer = nn.TransformerEncoderLayer(width, heads, 4 * width, dropout=0.0, batch_first=True, norm_first=True)
-        self.encoder = nn.TransformerEncoder(layer, layers, enable_nested_tensor=False)
-        self.norm = nn.LayerNorm(width)
-        nn.init.normal_(self.gene.weight, std=0.02)
-        nn.init.normal_(self.rank.weight, std=0.02)
-
-    def forward(self, tokens: torch.Tensor) -> torch.Tensor:
-        positions = torch.arange(tokens.shape[1], device=tokens.device)
-        hidden = self.norm(self.encoder(self.gene(tokens) + self.rank(positions)))
-        return hidden @ self.gene.weight[:-1].T
 
 
 class EncoderTrainNode(Node):
@@ -61,7 +43,7 @@ class EncoderTrainNode(Node):
             "out_dir": ParameterDefinition(default_value="runs/tier_s_smoke", description="Folder for the checkpoint and metrics."),
         },
         inputs={
-            "data_path": PortDefinition(type=PortType.STR, description="File with 'tokens' (n_cells x seq_len) and 'vocab_size'."),
+            "data_path": PortDefinition(type=PortType.STR, description="File with 'tokens' (cells x seq_len, -1 is padding) and 'vocab_size'; 'is_heldout' if the cells were split upstream."),
         },
         outputs={
             "metrics": PortDefinition(type=PortType.DICT, description="Device, weight count, steps done, timing, first and last training loss, held-out loss, baseline losses, status."),
@@ -85,29 +67,43 @@ class EncoderTrainNode(Node):
         device = "cuda" if torch.cuda.is_available() else "cpu"
         data = torch.load(data_path)
         tokens, vocab = data["tokens"].long(), int(data["vocab_size"])
-        n_hold = max(1, int(len(tokens) * float(p["holdout_fraction"])))
-        held, train = tokens[:n_hold], tokens[n_hold:]
-        model = RankEncoder(vocab, tokens.shape[1], int(p["width"]), int(p["layers"]), int(p["heads"])).to(device)
+        config = {"vocab_size": vocab, "seq_len": tokens.shape[1], "width": int(p["width"]), "layers": int(p["layers"]), "heads": int(p["heads"])}
+        model = RankEncoder(**config).to(device)
+        tokens = torch.where(tokens < 0, torch.full_like(tokens, model.pad_id), tokens)
+        if "is_heldout" in data:  # real cells: the split was made by sample, upstream
+            is_held = data["is_heldout"].bool()
+            held, train = tokens[is_held], tokens[~is_held]
+            split = "by sample, from the token file"
+        else:  # synthetic cells have no samples
+            n_hold = max(1, int(len(tokens) * float(p["holdout_fraction"])))
+            held, train = tokens[:n_hold], tokens[n_hold:]
+            split = "first rows of the file"
         optim = torch.optim.AdamW(model.parameters(), lr=float(p["learning_rate"]))
         steps, batch, frac = int(p["steps"]), int(p["batch_size"]), float(p["mask_fraction"])
         ceiling_s = 60.0 * float(p["ceiling_minutes"])
         gen = torch.Generator().manual_seed(int(p["seed"]))
 
         def masked_loss(cells: torch.Tensor) -> torch.Tensor:
-            cells = cells.to(device)
-            mask = torch.rand(cells.shape, generator=gen).to(device) < frac
-            logits = model(cells.masked_fill(mask, model.mask_id))
-            return nn.functional.cross_entropy(logits[mask], cells[mask])
+            cells = trim(cells, model.pad_id).to(device)
+            is_gene = cells != model.pad_id
+            mask = (torch.rand(cells.shape, generator=gen).to(device) < frac) & is_gene
+            if not mask.any():
+                mask = is_gene
+            hidden = model.hidden(cells.masked_fill(mask, model.mask_id))
+            return nn.functional.cross_entropy(model.gene_logits(hidden[mask]), cells[mask])
 
         def sync() -> None:
             if device == "cuda":
                 torch.cuda.synchronize()
 
+        gene_tokens = (train != model.pad_id).sum(dim=1)
         metrics: Dict[str, Any] = {
             "device": torch.cuda.get_device_name(0) if device == "cuda" else "cpu",
             "weights": sum(w.numel() for w in model.parameters()),
-            "train_cells": len(train), "heldout_cells": len(held), "vocab_size": vocab, "seq_len": tokens.shape[1],
-            "steps_planned": steps, "batch_size": batch, "precision": "fp32",
+            "train_cells": len(train), "heldout_cells": len(held), "split": split,
+            "vocab_size": vocab, "seq_len": tokens.shape[1],
+            "median_tokens_per_train_cell": int(gene_tokens.median()),
+            "steps_planned": steps, "batch_size": batch, "precision": "fp32", "seed": int(p["seed"]),
         }
         losses, check_n = [], int(p["start_check_steps"])
         start = time.perf_counter()
@@ -122,7 +118,7 @@ class EncoderTrainNode(Node):
                 sync()
                 projected = (time.perf_counter() - start) / check_n * steps
                 metrics["start_check_projected_s"] = round(projected, 1)
-                print(f"start check: projected {projected:.0f} s against a ceiling of {ceiling_s:.0f} s")
+                print(f"start check: projected {projected:.0f} s against a ceiling of {ceiling_s:.0f} s", flush=True)
                 if projected > ceiling_s:
                     metrics["status"] = "not started: start check over the ceiling"
                     return {"metrics": metrics, "checkpoint_path": ""}
@@ -138,20 +134,19 @@ class EncoderTrainNode(Node):
         model.eval()
         with torch.no_grad():
             held_loss = sum(masked_loss(held[i:i + batch]).item() for i in range(0, len(held), batch)) / math.ceil(len(held) / batch)
-        counts = torch.bincount(train.flatten(), minlength=vocab).float() + 1.0
+        counts = torch.bincount(train[train != model.pad_id], minlength=vocab)[:vocab].float() + 1.0
         log_freq = (counts / counts.sum()).log()
         metrics.update({
             "steps_done": done, "train_seconds": round(elapsed, 1), "steps_per_second": round(done / elapsed, 2),
-            "tokens_per_second": round(done * batch * tokens.shape[1] / elapsed),
             "loss_first10": round(sum(losses[:10]) / 10, 3), "loss_last10": round(sum(losses[-10:]) / 10, 3),
             "heldout_loss": round(held_loss, 3),
             "baseline_uniform_loss": round(math.log(vocab), 3),
-            "baseline_gene_frequency_loss": round(-log_freq[held.flatten()].mean().item(), 3),
+            "baseline_gene_frequency_loss": round(-log_freq[held[held != model.pad_id]].mean().item(), 3),
             "peak_gpu_memory_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else None,
             "losses_finite": all(math.isfinite(x) for x in losses),
         })
         out = Path(p["out_dir"])
         out.mkdir(parents=True, exist_ok=True)
-        torch.save(model.state_dict(), out / "model.pt")
+        torch.save({"state_dict": model.state_dict(), "config": config}, out / "model.pt")
         (out / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
         return {"metrics": metrics, "checkpoint_path": str(out / "model.pt")}
