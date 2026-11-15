@@ -20,7 +20,7 @@ flowchart TD
 
 ## Tier S smoke test on synthetic cells
 
-`workflows/tier_s_smoke.py`: 2 nodes of 2 kinds, 1 connections.
+`workflows/tier_s_smoke.py`: 2 nodes of 2 kinds, 1 connection.
 The tier M timing run (`tier_m_timing.py`) has the same graph with a larger model.
 
 ```mermaid
