@@ -1,0 +1,4 @@
+geneformer/Geneformer/
+scgpt/checkpoint/
+**/.venv/
+**/uv.lock
