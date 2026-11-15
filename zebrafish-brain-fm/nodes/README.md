@@ -17,7 +17,7 @@ flowchart LR
         M["ManifestLoaderNode"] -->|"rows"| C["ManifestCheckNode"]
     end
     subgraph W1["tier_s_smoke"]
-        S["SyntheticCellsNode"] -->|"data_path"| T["TierSTrainNode"]
+        S["SyntheticCellsNode"] -->|"data_path"| T["EncoderTrainNode"]
     end
 ```
 
@@ -62,9 +62,9 @@ Makes cells for smoke tests and timing. Each cell type has a random score for ev
 | Output | `data_path` | STR | The saved file |
 | Output | `n_cells` | INT | Cells written |
 
-## TierSTrainNode
+## EncoderTrainNode
 
-`tier_s_train.py` · type `zfbrain_tier_s_train` · stage `training` (proposed, not in the Neuro-Workflow stage list)
+`encoder_train.py` · type `zfbrain_encoder_train` · stage `training` (proposed, not in the Neuro-Workflow stage list)
 
 Trains a small transformer by masked-gene prediction. The model has a gene embedding, a rank-position embedding, a transformer encoder and output weights tied to the gene embedding.
 

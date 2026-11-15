@@ -1,4 +1,4 @@
-"""Smoke-test node: train the smallest (tier S) encoder by masked-gene prediction."""
+"""Train a rank-token encoder by masked-gene prediction. The defaults are tier S."""
 
 import json
 import math
@@ -39,9 +39,9 @@ class RankEncoder(nn.Module):
         return hidden @ self.gene.weight[:-1].T
 
 
-class TierSTrainNode(Node):
+class EncoderTrainNode(Node):
     NODE_DEFINITION = NodeDefinitionSchema(
-        type="zfbrain_tier_s_train",
+        type="zfbrain_encoder_train",
         stage="training",  # proposed stage; not in the Neuro-Workflow stage list yet
         tool="PyTorch",
         model_source="https://github.com/Kays3/geneformer-vs-brainiac/tree/main/zebrafish-brain-fm",

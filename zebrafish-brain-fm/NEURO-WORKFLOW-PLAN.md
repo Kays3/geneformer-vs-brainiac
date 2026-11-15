@@ -20,7 +20,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    S["SyntheticCellsNode<br/>stage: io"] -->|"data_path: STR"| T["TierSTrainNode<br/>stage: training, proposed"]
+    S["SyntheticCellsNode<br/>stage: io"] -->|"data_path: STR"| T["EncoderTrainNode<br/>stage: training, proposed"]
     T --> O["metrics: DICT<br/>checkpoint_path: STR"]
 ```
 

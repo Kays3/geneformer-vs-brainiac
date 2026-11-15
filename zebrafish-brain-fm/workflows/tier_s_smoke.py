@@ -18,12 +18,12 @@ sys.path.insert(0, str(ROOT / "nodes"))
 from neuroworkflow import WorkflowBuilder  # noqa: E402
 
 from synthetic_cells import SyntheticCellsNode  # noqa: E402
-from tier_s_train import TierSTrainNode  # noqa: E402
+from encoder_train import EncoderTrainNode  # noqa: E402
 
 tiny = "--tiny" in sys.argv
 name = "tier_s_tiny" if tiny else "tier_s_smoke"
 cells = SyntheticCellsNode("Cells")
-train = TierSTrainNode("Train")
+train = EncoderTrainNode("Train")
 cells.configure(out_path=str(ROOT / "data" / "derived" / f"{name}_cells.pt"))
 train.configure(out_dir=str(ROOT / "runs" / name))
 if tiny:
