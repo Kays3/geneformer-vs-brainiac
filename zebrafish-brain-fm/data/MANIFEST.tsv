@@ -1,9 +1,17 @@
-layer	dataset	reference_doi	local_path	sha256	licence	stage_used
-single_cell	Raj 2020 brain atlas	10.1016/j.neuron.2020.09.023				1
-single_cell	Daniocell	10.1016/j.devcel.2023.11.001				1
-single_cell	Zebrahub	10.1016/j.cell.2024.09.047				1
-architecture	mapzebrain atlas	10.1016/j.neuron.2019.04.034				2
-architecture	mapzebrain gene expression	10.1126/sciadv.ade9909				2
-architecture	Z-Brain	10.1038/nmeth.3581				2
-functional_genomics	DANIO-CODE	10.1038/s41588-022-01089-w				3
-functional_genomics	Thyme 2019 mutants	10.1016/j.cell.2019.01.048				3
+layer	tissue	dataset	accession	reference_doi	local_path	sha256	licence	licence_source	size	stage_used	note
+single_cell	retina	Xu 2020 retina development	GSE122680	10.1242/dev.185660	data/raw/GSE122680	a0441740c526d87427c1bda861732c094ab33b8c4470eb285b00114b89ad3d98	NCBI GEO: NCBI places no restriction on use or distribution; submitters may hold rights; cite the paper	https://www.ncbi.nlm.nih.gov/home/about/policies/ (read 2026-11-15)	176M	1	8 samples; 35,791 barcodes; 28,951 genes; Ensembl gene ids
+single_cell	retina	Celotto 2023 retina regeneration	GSE226373	10.7554/eLife.86507	data/raw/GSE226373	7a4fc9f0c96fa402c42126fd10ecaeba3c37c91196ec0ec2ceb0f78bea93d527	NCBI GEO: NCBI places no restriction on use or distribution; submitters may hold rights; cite the paper	https://www.ncbi.nlm.nih.gov/home/about/policies/ (read 2026-11-15)	39M	1	5 samples; 24,604 cells; 27,691 features; Ensembl gene ids, GRCz11 Ensembl 95
+single_cell	retina	Kolsch 2021 retinal ganglion cells	GSE152842	10.1016/j.neuron.2020.12.003	data/raw/GSE152842	0019dfa73602287a47c26578f4a0eec14a2ab51927a7a49d34f3c2efacf54f00	NCBI GEO: NCBI places no restriction on use or distribution; submitters may hold rights; cite the paper	https://www.ncbi.nlm.nih.gov/home/about/policies/ (read 2026-11-15)	78M	1	adult 48,588 cells and larva 12,698 cells; 24,105 genes; upper-case symbols, no Ensembl ids
+single_cell	retina	Hahn 2023 retina atlas, zebrafish part	GSE237214	10.1038/s41586-023-06638-9	data/raw/GSE237214	e951b59beb75891b37e536afaf9b2eda50b13e00d54f99e4389e467642f98cac	NCBI GEO: NCBI places no restriction on use or distribution; submitters may hold rights; cite the paper	https://www.ncbi.nlm.nih.gov/home/about/policies/ (read 2026-11-15)	132M	1	150,535 cells; 25,233 genes; upper-case symbols, no Ensembl ids
+single_cell	retina	Ogawa 2021 adult photoreceptors	GSE175929	10.1038/s41598-021-96837-z	data/raw/GSE175929	bf1fe6ed7274c8df9fef3d997fa0798e7da89f2ecbe5d57b32cfbfa9446f06b5	NCBI GEO: NCBI places no restriction on use or distribution; submitters may hold rights; cite the paper	https://www.ncbi.nlm.nih.gov/home/about/policies/ (read 2026-11-15)	496M	1	1 sample; 12,833 barcodes; 37,375 features; Lawson Lab gene ids (LL...), custom GTF included
+single_cell	retina	Lyu 2023 retina injury, single-nucleus RNA	GSE239410	10.1038/s41467-023-44142-w	data/raw/GSE239410	2235b7d2f38afe2e77879fbde506f138eab0d4b081058e5880134dc5b1337fd8	NCBI GEO: NCBI places no restriction on use or distribution; submitters may hold rights; cite the paper	https://www.ncbi.nlm.nih.gov/home/about/policies/ (read 2026-11-15)	454M	1	137,490 nuclei; 32,520 genes; Ensembl gene ids; cell type labels included
+functional_genomics	retina	Lyu 2023 retina injury, single-nucleus ATAC	GSE239410	10.1038/s41467-023-44142-w					2.1G	3	not downloaded
+functional_genomics	retina	Hoang 2020 Muller glia RNA and ATAC, zebrafish and mouse	GSE135406	10.1126/science.abb8598					173M	3	not downloaded
+single_cell	brain	Raj 2020 brain atlas	GSE158142	10.1016/j.neuron.2020.09.023						1	not downloaded; the series also holds retina trajectory objects
+single_cell	whole animal	Daniocell		10.1016/j.devcel.2023.11.001						1	terms not read
+single_cell	whole animal	Zebrahub		10.1016/j.cell.2024.09.047						1	terms not read
+architecture	brain	mapzebrain atlas		10.1016/j.neuron.2019.04.034						2	terms not read
+architecture	brain	mapzebrain gene expression		10.1126/sciadv.ade9909						2	terms not read
+architecture	brain	Z-Brain		10.1038/nmeth.3581						2	terms not read
+functional_genomics	whole animal	DANIO-CODE		10.1038/s41588-022-01089-w						3	terms not read
+functional_genomics	brain	Thyme 2019 mutants		10.1016/j.cell.2019.01.048						3	terms not read

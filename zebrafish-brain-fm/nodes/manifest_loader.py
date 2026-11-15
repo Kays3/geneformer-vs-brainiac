@@ -23,7 +23,7 @@ class ManifestLoaderNode(Node):
         parameters={
             "manifest_path": ParameterDefinition(
                 default_value="data/MANIFEST.tsv",
-                description="Path to the manifest file with the columns layer, dataset, reference_doi, local_path, sha256, licence, stage_used.",
+                description="Path to the manifest file. Its columns include layer, tissue, dataset, accession, reference_doi, local_path, sha256, licence and stage_used.",
             ),
         },
         inputs={},
