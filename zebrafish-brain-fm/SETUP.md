@@ -1,6 +1,6 @@
 # Setup
 
-What is checked, on 15 November 2026 on a Linux aarch64 GPU machine, from a fresh clone at commit `464fd11`: `uv sync` completes (about 26 seconds, 6.2 GB environment), `scanpy` 1.12.6 and `torch` 2.15.0 import, `torch` sees the GPU, and the stage 0 workflow runs and reports 0 ready and 8 blocked. Downloading data and training are untested. On macOS only the dependency resolution was checked.
+What is checked, on 15 November 2026 on a Linux aarch64 GPU machine, from a fresh clone at commit `464fd11`: `uv sync` completes (about 26 seconds, 6.2 GB environment), `scanpy` 1.12.6 and `torch` 2.15.0 import, `torch` sees the GPU, and the stage 0 workflow runs. With the retina data in place it reports 6 ready and verified and 10 blocked; on a machine without the data it reports the 6 as not on this machine. Downloading data and training are untested. On macOS only the dependency resolution was checked.
 
 ## 1. Environment
 
@@ -13,7 +13,7 @@ uv sync
 uv run python -c "import scanpy, torch; print(scanpy.__version__, torch.__version__)"
 ```
 
-Then run the first workflow. It reads the manifest and lists the data sets that may not be used yet:
+Then run the first workflow. It reads the manifest, lists the data sets that may be used, and checks the files of those that are on this machine against their checksums:
 
 ```bash
 uv run python workflows/stage0_inventory.py
@@ -53,18 +53,22 @@ Add `tests/` with the first node that computes something.
 
 ## 3. Data rule
 
-No data in git. For each download, add its path, its sha256 and its licence to `data/MANIFEST.tsv`:
+No data in git. Each data set gets a folder `data/raw/<accession>/` with a `SHA256SUMS` file that lists every file in it. The manifest records the folder, the sha256 of that `SHA256SUMS` file, and the licence:
 
 ```bash
-shasum -a 256 data/raw/<file>
+cd data/raw/<accession>
+sha256sum * > SHA256SUMS      # run before SHA256SUMS exists, or exclude it
+sha256sum SHA256SUMS          # this value goes in the manifest
 ```
 
 A data set with an empty licence cell is not used.
 
 ## 4. Stage 0 checklist
 
-- [ ] Read the download and reuse terms of each source in the manifest. Fill the licence column.
-- [ ] Fix the genome build and the gene identifier set for the whole project.
+- [x] Retina: six single-cell data sets downloaded, checksummed and recorded, with NCBI's general reuse policy as the licence ([RETINA.md](RETINA.md)).
+- [ ] Read the data statement of each retina paper.
+- [ ] Read the download and reuse terms of the ten sources still blocked in the manifest.
+- [ ] Fix the genome build and the gene identifier set for the whole project. The six retina data sets use four kinds of identifier.
 - [ ] Choose the reference brain space.
 - [ ] Choose the larval stage or stages.
 - [ ] Write the stage 1 test and its baseline before any training.

@@ -8,13 +8,14 @@ This folder starts a new project: one model of the larval zebrafish brain that j
 
 Web page of this introduction: <https://claude.ai/artifact/4hozJekQgTHWnEeZTGN9VC> (private until shared; the source is `artifact/intro.html`).
 
-**Status: a plan.** No real data are downloaded and there are no results about zebrafish. The environment installs, the stage 0 inventory runs, and the smallest model has been trained once on synthetic cells as a smoke test (see [SETUP.md](SETUP.md) and [GPU-AND-SCALE.md](GPU-AND-SCALE.md)).
+**Status: stage 0 is done for the retina; there are no results about zebrafish yet.** Six public single-cell data sets of the zebrafish retina (422,539 cells or barcodes) are downloaded, checksummed, inspected and recorded (see [RETINA.md](RETINA.md)). No model has seen them. Two model sizes have been trained on synthetic cells only, to test the code and to measure speed (see [GPU-AND-SCALE.md](GPU-AND-SCALE.md)).
 
 ## Documents
 
 | Read | For |
 |---|---|
 | This page | The idea, the data sources, the stages and their tests |
+| [RETINA.md](RETINA.md) | Stage 0 for the retina: the six data sets that are ready, and what the inventory found |
 | [SETUP.md](SETUP.md) | Installing, the first commands, working across machines |
 | [NEURO-WORKFLOW-PLAN.md](NEURO-WORKFLOW-PLAN.md) | The architecture: every step a schema-defined node |
 | [nodes/README.md](nodes/README.md) | Reference for each node and workflow that exists now |
@@ -80,7 +81,7 @@ Each stage has a simple baseline. If the baseline wins, the stage reports that.
 
 | Stage | Work | Test | Baseline or null |
 |---|---|---|---|
-| 0 | Inventory: download terms, file formats, genome build, gene identifiers. Record each data set in `data/MANIFEST.tsv` | None | None |
+| 0 | Inventory: download terms, file formats, genome build, gene identifiers. Record each data set in `data/MANIFEST.tsv`. Done for six retina data sets ([RETINA.md](RETINA.md)) | None | None |
 | 1 | Cell encoder: genes ranked by expression in each cell, read by a small transformer | Cell type and stage on held-out animals and held-out data sets | Principal components with a linear classifier |
 | 2 | Cells into the brain: predict the region of a cell from its expression, through the marker gene maps | Regions of cell types with known positions | Random marker sets of the same size |
 | 3 | Functional genomics: remove a gene in the model and predict which regions change | The 132 mutants: predicted regions against the measured maps | Expression-matched random genes |
@@ -104,6 +105,8 @@ Stage 3 is the reason to combine the layers. The mutant collection is a set of m
 The six questions in the [repository README](../README.md) apply here from the first run: split by animal, permute the labels, compare with random genes and random regions, repeat on a second data set, repeat across seed and precision, and fix the benchmarks before the run.
 
 ## Open decisions
+
+- Retina first is now the working scope. Whether the brain-wide sources in the table above follow, and when, is open.
 
 - Train from scratch on zebrafish, adapt a model trained on other species through orthologs, or do both and compare.
 - One larval stage only (6 days), or development as well.

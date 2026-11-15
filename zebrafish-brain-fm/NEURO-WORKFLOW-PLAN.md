@@ -6,17 +6,20 @@ Read at commit `3a4b03b6` (14 November 2026). Neuro-Workflow is not yet publishe
 
 ## What is checked
 
-Two workflows run, each a graph of two nodes from [`nodes/`](nodes/). [nodes/README.md](nodes/README.md) is the reference for both.
+Three workflows run, built from the five nodes in [`nodes/`](nodes/). [nodes/README.md](nodes/README.md) is the reference for both.
 
-[`workflows/stage0_inventory.py`](workflows/stage0_inventory.py) reads the data manifest and reports which data sets may be used. On 15 November 2026 it reported 0 ready and 8 blocked, which is correct for an empty manifest.
+[`workflows/stage0_inventory.py`](workflows/stage0_inventory.py) reads the data manifest, reports which data sets may be used, and verifies their files. On 15 November 2026, with the retina data in place, it reported 6 ready and verified and 10 blocked.
 
 ```mermaid
 flowchart LR
     M["ManifestLoaderNode<br/>stage: io"] -->|"rows: LIST"| C["ManifestCheckNode<br/>stage: analysis"]
-    C --> O["ready: LIST<br/>blocked: DICT"]
+    M -->|"rows: LIST"| V["ManifestVerifyNode<br/>stage: analysis"]
+    C -->|"ready: LIST"| V
+    C --> O1["blocked: DICT"]
+    V --> O2["verified: LIST<br/>failed: DICT<br/>absent: LIST"]
 ```
 
-[`workflows/tier_s_smoke.py`](workflows/tier_s_smoke.py) trains the smallest model on synthetic cells. It ran on 15 November 2026 on one GPU; the numbers are in [GPU-AND-SCALE.md](GPU-AND-SCALE.md).
+[`workflows/tier_s_smoke.py`](workflows/tier_s_smoke.py) trains the smallest model on synthetic cells. It ran on 15 November 2026 on one GPU. [`workflows/tier_m_timing.py`](workflows/tier_m_timing.py) is the same graph with the larger model. The numbers of both are in [GPU-AND-SCALE.md](GPU-AND-SCALE.md).
 
 ```mermaid
 flowchart LR
@@ -38,7 +41,7 @@ Neuro-Workflow's stage list is `io`, `neuron`, `population`, `synapse`, `connect
 
 | Project stage | Nodes | Neuro-Workflow stage |
 |---|---|---|
-| 0 Inventory | Manifest loader, manifest check (both written) | `io`, `analysis` |
+| 0 Inventory | Manifest loader, manifest check, manifest verify (all written) | `io`, `analysis` |
 | 1 Cell encoder | Atlas loader; rank tokenizer; encoder training; embedding; held-out classifier; baseline classifier | `io`, then see the gap below |
 | 2 Cells into the brain | Region atlas loader; marker map loader; region predictor; random marker null | `io`, `analysis` |
 | 3 Functional genomics | Mutant map loader; in silico gene removal; region comparison; matched random gene null | `io`, `analysis` |
@@ -66,7 +69,7 @@ flowchart TD
 ## Gaps to settle first
 
 1. **No stage for machine learning.** Tokenizing, pretraining and fine-tuning match none of the nine stages. The node guide allows a new stage to be proposed. Decide the names (for example `representation` and `training`) and ask the Neuro-Workflow maintainers before many nodes exist. The smoke-test training node already uses `stage="training"`; the library ran it without complaint, but the name is not agreed.
-2. **Long GPU runs inside a node are untried here.** The only GPU run so far lasted three minutes. The library describes itself as an in-memory workflow library. A training node should launch and watch a job and return a path to a checkpoint. It should not hold the model in a port. See [GPU-AND-SCALE.md](GPU-AND-SCALE.md).
+2. **Long GPU runs inside a node are little tried here.** The longest so far lasted 48 minutes and ran detached without trouble. The library describes itself as an in-memory workflow library. A training node should launch and watch a job and return a path to a checkpoint. It should not hold the model in a port. See [GPU-AND-SCALE.md](GPU-AND-SCALE.md).
 3. **Large data on ports.** Ports carry Python objects. Atlases of hundreds of thousands of cells should pass as file paths with a sha256, not as arrays.
 4. **Licence.** Neuro-Workflow is under PolyForm Noncommercial 1.0.0. This project depends on it as an installed package and copies none of its code. Choose this repository's own licence with that in mind.
 5. **Where nodes live.** Nodes stay in this repository's `nodes/` folder. Offering them to the Neuro-Workflow node library is a later, separate decision.
@@ -82,9 +85,10 @@ flowchart TD
 ## Order of work
 
 1. Settle gaps 1 and 4.
-2. Finish stage 0 with the two existing nodes: fill the manifest until the check reports 8 ready.
-3. Write the stage 1 nodes on a 10,000-cell sample (tier S in the GPU plan), baseline node first.
-4. Add the training node only after the tier S workflow runs end to end on a laptop.
+2. Stage 0 is done for six retina data sets ([RETINA.md](RETINA.md)). Ten sources remain blocked in the manifest.
+3. Write the gene identifier map node: the six retina data sets use four kinds of identifier.
+4. Write the other stage 1 nodes on a 10,000-cell sample of real retina cells (tier S in the GPU plan), baseline node first.
+5. Train on real cells only after that tier S workflow runs end to end.
 
 ## Sources
 

@@ -114,3 +114,34 @@ What it shows:
 What it does not show: anything about real cells, the tier M model, a second seed, or the permuted-label control.
 
 In this test the start check sits inside the training node. The plan above asks for a separate start-check node; that is still to do.
+
+## Second measurement: the tier M model on synthetic cells (15 November 2026)
+
+The tier M sized model was trained on **synthetic cells** to measure speed and memory. It is not the tier M model of the plan, which needs real cells. The result says nothing about zebrafish.
+
+Run it with `uv run python workflows/tier_m_timing.py --steps 2500 --ceiling 60`. The full record is [`compute/runs/tier-m-timing-20261115.json`](compute/runs/tier-m-timing-20261115.json).
+
+| Quantity | Tier S smoke test | Tier M timing run |
+|---|---|---|
+| Model | 4 layers, width 128 | 6 layers, width 256 |
+| Weights | 4,895,616 | 12,943,616 |
+| Training and held-out cells | 9,000 and 1,000 | 18,000 and 2,000 |
+| Steps, batch of 32 | 300 | 2,500 |
+| Training time | 177.9 s | 2,876.7 s |
+| Steps per second | 1.69 | 0.87 |
+| Tokens per second | about 110,500 | about 57,000 |
+| Peak GPU memory | 11.35 GB | 14.8 GB |
+| Held-out loss | 9.916 | 9.591 |
+| Baseline: gene frequency | 10.127 | 10.127 |
+| Baseline: uniform | 10.309 | 10.309 |
+
+What it shows:
+
+- The tier M model runs at about half the speed of tier S and needs 14.8 GB at this batch size.
+- The start check projected 2,937 s against a 3,600 s ceiling; the run took 2,877 s of training and 48.4 minutes from start to checkpoint.
+- One pass over 1.45 billion tokens with the tier M model would take about 7.1 hours on this GPU (1.45 billion / 57,000 per second). This is arithmetic from one run on synthetic cells of full length.
+- The stage ceiling was 1.0 GPU-hour. The calibration and this run used 0.818.
+
+The two held-out losses cannot be compared as "tier M is better": the tier M run had eight times the steps and twice the cells. No conclusion about model size follows.
+
+GPU time recorded so far, all on synthetic cells: 0.869 GPU-hours.

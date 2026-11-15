@@ -2,19 +2,22 @@
 
 Reference for what exists now. Each node is one file in this folder and one class with a `NODE_DEFINITION`. The definitions in the code are the source of truth; this page repeats them for reading.
 
-All four nodes ran on 15 November 2026. None has unit tests yet.
+All five nodes ran on 15 November 2026. None has unit tests yet.
 
 ## Workflows
 
 | Workflow | Graph | Needs | Run |
 |---|---|---|---|
-| [`stage0_inventory.py`](../workflows/stage0_inventory.py) | ManifestLoader → ManifestCheck | Neuro-Workflow only | `uv run python workflows/stage0_inventory.py` |
-| [`tier_s_smoke.py`](../workflows/tier_s_smoke.py) | SyntheticCells → TierSTrain | PyTorch; a GPU for the full size | `uv run python workflows/tier_s_smoke.py --tiny` or `--steps 300` |
+| [`stage0_inventory.py`](../workflows/stage0_inventory.py) | ManifestLoader → ManifestCheck → ManifestVerify | Neuro-Workflow only | `uv run python workflows/stage0_inventory.py` |
+| [`tier_s_smoke.py`](../workflows/tier_s_smoke.py) | SyntheticCells → EncoderTrain | PyTorch; a GPU for the full size | `uv run python workflows/tier_s_smoke.py --tiny` or `--steps 300` |
+| [`tier_m_timing.py`](../workflows/tier_m_timing.py) | SyntheticCells → EncoderTrain, at 6 layers and width 256 | PyTorch and a GPU | `uv run python workflows/tier_m_timing.py --steps 2500 --ceiling 60` |
 
 ```mermaid
 flowchart LR
     subgraph W0["stage0_inventory"]
         M["ManifestLoaderNode"] -->|"rows"| C["ManifestCheckNode"]
+        M -->|"rows"| V["ManifestVerifyNode"]
+        C -->|"ready"| V
     end
     subgraph W1["tier_s_smoke"]
         S["SyntheticCellsNode"] -->|"data_path"| T["EncoderTrainNode"]
@@ -25,7 +28,7 @@ flowchart LR
 
 `manifest_loader.py` · type `zfbrain_manifest_loader` · stage `io`
 
-Reads `data/MANIFEST.tsv` into a list of dictionaries.
+Reads `data/MANIFEST.tsv` into a list of dictionaries. The manifest has one row per data set: layer, tissue, name, accession, paper, folder, sha256, licence and its source, size, stage and a note.
 
 | Kind | Name | Type or default | Meaning |
 |---|---|---|---|
@@ -43,6 +46,21 @@ Splits data sets into those that may be used and those that may not. A data set 
 | Input | `rows` | LIST | From the manifest loader |
 | Output | `ready` | LIST | Names of usable data sets |
 | Output | `blocked` | DICT | For each other data set, its empty fields |
+
+## ManifestVerifyNode
+
+`manifest_verify.py` · type `zfbrain_manifest_verify` · stage `analysis`
+
+Checks the files of each ready data set on the machine where it runs. The folder must hold a `SHA256SUMS` file whose own sha256 equals the manifest value, and every file listed in it must match.
+
+| Kind | Name | Type or default | Meaning |
+|---|---|---|---|
+| Parameter | `root` | `.` | Folder that the manifest paths are relative to |
+| Input | `rows` | LIST | From the manifest loader |
+| Input | `ready` | LIST | From the manifest check |
+| Output | `verified` | LIST | Data sets whose files all match |
+| Output | `failed` | DICT | Data sets present but not matching, with the reason |
+| Output | `absent` | LIST | Ready data sets whose folder is not on this machine |
 
 ## SyntheticCellsNode
 

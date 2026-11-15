@@ -62,28 +62,50 @@ pre { margin: 0; background: var(--surface); border: 1px solid var(--line); bord
   <span class="eyebrow">Project introduction · <i>Danio rerio</i>, larval brain</span>
   <h1>A foundation model of the zebrafish brain</h1>
   <p class="lede">One model that joins what each cell expresses, where cells sit in the brain, and what happens when a gene is removed.</p>
-  <p class="status"><strong>Status: a plan.</strong> No real data are downloaded and there are no results about zebrafish. The environment installs, the stage 0 inventory runs, and the smallest model has been trained once on synthetic cells as a smoke test.</p>
+  <p class="status"><strong>Status: stage 0 is done for the retina; there are no results about zebrafish yet.</strong> Six public single-cell data sets of the zebrafish retina are downloaded, checksummed and recorded. No model has seen them. Two model sizes have been trained on synthetic cells only.</p>
 </section>
 
 <section>
   <h2>Where the work stands</h2>
-  <p class="src">As of 15 November 2026, 06:24 UTC.</p>
+  <p class="src">As of 15 November 2026, 07:00 UTC.</p>
   <div class="scroll"><table>
     <thead><tr><th>State</th><th>Item</th><th>Detail</th></tr></thead>
     <tbody>
       <tr><td><span class="tag a">DONE</span></td><td>Plan and documents</td><td>Introduction, setup, Neuro-Workflow architecture, GPU and scale plan, node reference, eleven diagrams</td></tr>
       <tr><td><span class="tag a">DONE</span></td><td>Environment</td><td>Installs from a clean clone on a Linux GPU machine in about 26 seconds</td></tr>
-      <tr><td><span class="tag a">DONE</span></td><td>Stage 0 workflow</td><td>Runs. It reports 0 data sets ready and 8 blocked, because no licence is recorded yet</td></tr>
+      <tr><td><span class="tag a">DONE</span></td><td>Stage 0 for the retina</td><td>Six data sets from NCBI GEO, 422,539 cells or barcodes, 1.4 GB. The workflow reports 6 ready and verified, 10 blocked</td></tr>
       <tr><td><span class="tag a">DONE</span></td><td>Tier S smoke test</td><td>4.9 M weights on synthetic cells, 300 steps in 178 s, held-out loss below both baselines</td></tr>
       <tr><td><span class="tag a">DONE</span></td><td>Tier M calibration</td><td>12.9 M weights, 12 steps: 0.85 steps per second, 14.75 GB peak GPU memory</td></tr>
-      <tr><td><span class="tag f">RUNNING</span></td><td>Tier M timing run</td><td>2,500 steps on synthetic cells under a 60-minute ceiling, started 05:49 UTC. No result yet</td></tr>
-      <tr><td><span class="tag c">NEXT</span></td><td>Record the tier M run</td><td>Check its output, then add the ledger row and the run summary</td></tr>
-      <tr><td><span class="tag c">NEXT</span></td><td>Stage 0 for real</td><td>Read the reuse terms of the eight sources and fill the manifest</td></tr>
+      <tr><td><span class="tag a">DONE</span></td><td>Tier M timing run</td><td>2,500 steps on synthetic cells in 48 minutes: 0.87 steps per second, 14.8 GB peak, held-out loss 9.591 against a baseline of 10.127</td></tr>
+      <tr><td><span class="tag c">NEXT</span></td><td>Gene identifier map</td><td>The six retina data sets use four kinds of gene identifier and cannot share a vocabulary yet</td></tr>
+      <tr><td><span class="tag c">NEXT</span></td><td>Data statements</td><td>Read the data statement of each retina paper. The recorded licence is NCBI's general policy</td></tr>
+      <tr><td><span class="tag c">NEXT</span></td><td>The ten blocked sources</td><td>Retina chromatin data and the brain-wide atlases: terms not read, not downloaded</td></tr>
       <tr><td><span class="tag c">NEXT</span></td><td>Neuro-Workflow stage names</td><td>Agree names for tokenizing and training with its maintainers</td></tr>
-      <tr><td><span class="tag c">NOT STARTED</span></td><td>Anything on real cells</td><td>No data downloaded, no zebrafish result, no baseline comparison on real data</td></tr>
+      <tr><td><span class="tag c">NOT STARTED</span></td><td>Any model on real cells</td><td>No quality filter, no training, no zebrafish result, no baseline comparison on real data</td></tr>
     </tbody>
   </table></div>
-  <p>GPU time used so far: 0.062 GPU-hours recorded in the ledger (0.051 for the smoke test, 0.011 for the calibration). The running job is not yet counted. The repository is at the same commit on GitHub, the laptop and the GPU machine.</p>
+  <p>GPU time used so far, all on synthetic cells: 0.869 GPU-hours in the ledger (0.051 for the tier S smoke test, 0.818 for tier M).</p>
+</section>
+
+<section>
+  <h2>The retina data that are ready</h2>
+  <p>The project starts with the retina: its six cell classes are well defined, and one study (Kölsch et al. 2021) links ganglion cell types to their projections into the brain and to behaviour.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Data set</th><th>Accession</th><th>Cells or barcodes</th><th>Gene identifiers</th></tr></thead>
+    <tbody>
+      <tr><td>Xu 2020, development</td><td class="num">GSE122680</td><td class="num">35,791</td><td>Ensembl ids</td></tr>
+      <tr><td>Celotto 2023, regeneration</td><td class="num">GSE226373</td><td class="num">24,604</td><td>Ensembl ids, GRCz11</td></tr>
+      <tr><td>Kölsch 2021, ganglion cells</td><td class="num">GSE152842</td><td class="num">48,588 adult, 12,698 larval</td><td>Upper-case symbols</td></tr>
+      <tr><td>Hahn 2023, retina atlas</td><td class="num">GSE237214</td><td class="num">150,535</td><td>Upper-case symbols</td></tr>
+      <tr><td>Ogawa 2021, photoreceptors</td><td class="num">GSE175929</td><td class="num">12,833</td><td>Lawson Lab ids</td></tr>
+      <tr><td>Lyu 2023, injury, single nuclei</td><td class="num">GSE239410</td><td class="num">137,490</td><td>Ensembl ids</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>These are the counts in the deposited files. No quality filter has been applied, and some files may hold unfiltered barcodes.</li>
+    <li>The licence recorded is NCBI's general policy: NCBI places no restrictions on use or distribution, and submitters may still hold rights. The data statement of each paper has not been read.</li>
+    <li>Every file has a checksum, and the stage 0 workflow recomputes them all.</li>
+  </ul>
 </section>
 
 <section>
