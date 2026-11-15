@@ -122,6 +122,23 @@ Known limits:
 - For synthetic cells the held-out cells are the first rows of the file. For real cells the split comes from SampleSplitNode, by sample.
 - The gene-frequency baseline is the only non-trivial baseline. There is no permuted-label control, because this task has no labels.
 
+## The model
+
+`rank_encoder.py` holds the network that EncoderTrainNode trains and EmbedCellsNode reads. As run in stage 1 it has 3,315,072 weights; the gene embedding for 17,651 genes is the largest part. No cell type label enters the model.
+
+```mermaid
+flowchart TD
+    A["One nucleus<br/>counts for each gene"] --> B["Scale to 10,000 per nucleus,<br/>divide by the gene's median in the training nuclei"]
+    B --> C["Rank the genes, keep up to 2,048<br/>a list of gene tokens, padded"]
+    C --> D["Mask 15% of the tokens<br/>training only"]
+    D --> E["Gene embedding + rank-position embedding<br/>width 128"]
+    E --> F["4 transformer layers<br/>4 attention heads, feed-forward 512, pre-norm"]
+    F --> G["Layer norm"]
+    G -->|"training"| H["Predict each masked gene<br/>output weights tied to the gene embedding"]
+    G -->|"after training"| I["Mean over the genes of the nucleus<br/>one vector of 128 numbers"]
+    I --> J["Logistic regression to cell type<br/>scored on held-out samples"]
+```
+
 ## Stage 1 nodes
 
 Six nodes carry the first run on real cells. The graph and its benchmarks are in [STAGE1-RETINA.md](../STAGE1-RETINA.md).
