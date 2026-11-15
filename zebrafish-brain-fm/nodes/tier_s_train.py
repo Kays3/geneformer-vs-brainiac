@@ -30,6 +30,8 @@ class RankEncoder(nn.Module):
         layer = nn.TransformerEncoderLayer(width, heads, 4 * width, dropout=0.0, batch_first=True, norm_first=True)
         self.encoder = nn.TransformerEncoder(layer, layers, enable_nested_tensor=False)
         self.norm = nn.LayerNorm(width)
+        nn.init.normal_(self.gene.weight, std=0.02)
+        nn.init.normal_(self.rank.weight, std=0.02)
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
         positions = torch.arange(tokens.shape[1], device=tokens.device)
