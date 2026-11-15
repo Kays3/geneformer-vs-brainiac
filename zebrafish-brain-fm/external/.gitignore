@@ -2,3 +2,5 @@ geneformer/Geneformer/
 scgpt/checkpoint/
 **/.venv/
 **/uv.lock
+geneformer/setup.log
+scgpt/setup.log
