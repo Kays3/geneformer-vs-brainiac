@@ -55,3 +55,92 @@ Every result is reported, including a model that cannot be installed or run. In 
 ## Cost
 
 These runs are charged to the stage 1 ceiling of 2.0 GPU-hours, of which 1.278 remained on 15 November 2026. Model weights are downloaded to the GPU machine and recorded in the manifest with checksums.
+
+---
+
+# Results
+
+Added on 15 November 2026, after the runs. Nothing above this line was changed. Code commit `2a9d0c2`; full record in [`compute/runs/stage1b-retina-external-20261115.json`](compute/runs/stage1b-retina-external-20261115.json).
+
+Both published models were installed and run. Each embedded all 10,000 nuclei; none was left without tokens.
+
+## Cell type on the held-out samples
+
+Same 2,269 held-out nuclei, same probe, same measure as stage 1.
+
+| Features | Width | Macro F1 | Balanced accuracy | Accuracy |
+|---|---|---|---|---|
+| **scGPT whole-human, frozen** | 512 | **0.894** | 0.881 | 0.967 |
+| **Geneformer V2-104M, frozen** | 768 | **0.879** | 0.868 | 0.970 |
+| PCA of all zebrafish genes (the stage 1 baseline, repeated) | 128 | 0.853 | 0.841 | 0.968 |
+| PCA of the mapped human genes (mapping control) | 128 | 0.841 | 0.827 | 0.967 |
+| Tier S model of this project, seed 0 (from stage 1) | 128 | 0.826 | 0.802 | 0.960 |
+| Tier S model of this project, seed 1 (from stage 1) | 128 | 0.808 | 0.795 | 0.955 |
+
+## The benchmarks
+
+| Check | Geneformer | scGPT |
+|---|---|---|
+| At least the stage 1 PCA baseline (0.853) | **Passed** (0.879) | **Passed** (0.894) |
+| At least the mapping control (0.841) | **Passed**: +0.038 (95% interval 0.003 to 0.069) | **Passed**: +0.053 (0.024 to 0.085) |
+| Against the tier S model (0.826 and 0.808) | Higher by 0.05 to 0.07 | Higher by 0.07 to 0.09 |
+
+Against PCA of all genes, with intervals: Geneformer +0.026 (-0.007 to 0.056), scGPT +0.041 (0.011 to 0.071). So scGPT is ahead of the stage 1 baseline with an interval that excludes zero. Geneformer is ahead by the point estimate, with an interval that includes zero.
+
+## The cost of the gene mapping
+
+| Quantity | Value |
+|---|---|
+| Zebrafish genes in the data | 32,520 |
+| Zebrafish genes with exactly one human ortholog, kept | 16,295 |
+| Human genes after summing | 12,721 |
+| Share of all counts kept | 69.2% |
+| Human genes found in the scGPT vocabulary | 12,545 of 12,716 with a unique symbol |
+| Median Geneformer tokens per nucleus | 795 |
+| Macro F1 lost by PCA through the mapping | 0.012 (0.853 to 0.841) |
+
+Half of the genes and 31% of the counts are lost before either model sees a nucleus, and both models still come out ahead.
+
+## Checks made
+
+- **The stage 1 baseline reproduced exactly**: PCA of all genes gave 0.8532 again.
+- **Geneformer was run twice** (once alone, once with scGPT in the workflow). The two feature arrays are identical: largest absolute difference 0.0.
+- Loading Geneformer reported two weights as newly initialized, `pooler.dense.weight` and `pooler.dense.bias`. The feature used here is taken before the pooler, so they do not enter it.
+- scGPT's `embed_data` runs with mixed precision by default. Full precision was not tried.
+
+## One check added after the results (not registered)
+
+The published models give wider feature vectors (768 and 512) than the 128 principal components. To see whether width alone explains the gap, PCA was rerun at 512 and 768 components with the same probe. This was decided after seeing the results, so it is exploratory.
+
+| PCA components | All genes | Mapped genes |
+|---|---|---|
+| 128 (registered) | 0.853 | 0.841 |
+| 512 | 0.828 | 0.811 |
+| 768 | 0.820 | 0.804 |
+
+More components made PCA worse on this test. Width does not explain the gap.
+
+## Reading the result
+
+- **Two models trained only on human cells, used without any fine-tuning and through a lossy gene mapping, separate zebrafish retinal cell types better than principal components and better than this project's small model.** That is the plain finding.
+- **It is a real point against the tier S model as it stands.** A 3.3-million-weight model trained for 16 minutes on 7,731 nuclei is behind models with tens of millions of weights trained on tens of millions of cells. The comparison is not like for like, and it was not meant to be.
+- **The gaps are small in absolute terms**: 0.03 to 0.05 over PCA, on a test where accuracy over all nuclei is 0.96 to 0.97 for every method. The differences sit in the rare types, which have 8 to 19 held-out nuclei each.
+- **The labels still come from the authors' own analysis** of the same data. That favoured PCA in stage 1; here two models that never saw these data agree with those labels more closely than PCA does, which is some evidence the labels reflect cell identity and not only the authors' pipeline.
+- All limits listed before the run apply: one data set, one tissue, split by sample, the only control sample held out.
+
+## Cost
+
+| Run | From start to end | GPU-hours charged |
+|---|---|---|
+| Test runs on 1,000 nuclei (four, two of which failed before embedding) | under 4.3 minutes in all | 0.072, an upper bound |
+| Geneformer alone, 10,000 nuclei | 4.0 minutes | 0.066 |
+| Geneformer and scGPT, 10,000 nuclei | 6.1 minutes | 0.101 |
+| **Stage 1 and 1b together** | | **0.961 of 2.0** |
+
+The time charged is the whole workflow, most of it on the CPU, so it overstates GPU use.
+
+## What follows for the project
+
+1. A cross-species baseline now exists. Any model built here has to beat 0.894 on this test, not 0.853.
+2. The cheapest strong option is to start from one of the published models and adapt it to zebrafish, in place of training from nothing. This was an open decision in the introduction; this result is evidence for it.
+3. The gene mapping deserves its own test: a mapping that keeps duplicated zebrafish genes might raise both published models further.

@@ -56,7 +56,7 @@ def render():
         builder, _ = module.build(argv)
         kinds = sorted({type(node).__name__ for node in builder.nodes.values()})
         parts += [f"## {module.TITLE}", "",
-                  f"`workflows/{script}`: {len(builder.nodes)} nodes of {len(kinds)} kinds, {len(builder.connections)} connections.",
+                  f"`workflows/{script}`: {len(builder.nodes)} nodes of {len(kinds)} kinds, {len(builder.connections)} connection{"" if len(builder.connections) == 1 else "s"}.",
                   *([note] if note else []), "", "```mermaid", draw(builder), "```", ""]
     return "\n".join(parts)
 

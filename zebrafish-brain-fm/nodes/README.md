@@ -2,7 +2,7 @@
 
 Reference for what exists now. Each node is one file in this folder and one class with a `NODE_DEFINITION`. The definitions in the code are the source of truth; this page repeats them for reading.
 
-All eleven nodes ran on 15 November 2026. None has unit tests yet. `rank_encoder.py` is not a node: it holds the model that the training and embedding nodes share.
+All thirteen nodes ran on 15 November 2026. Diagrams of every workflow, generated from the code, are in [WORKFLOWS.md](../WORKFLOWS.md). None has unit tests yet. `rank_encoder.py` is not a node: it holds the model that the training and embedding nodes share.
 
 ## Workflows
 
@@ -11,6 +11,7 @@ All eleven nodes ran on 15 November 2026. None has unit tests yet. `rank_encoder
 | [`stage0_inventory.py`](../workflows/stage0_inventory.py) | ManifestLoader → ManifestCheck → ManifestVerify | Neuro-Workflow only | `uv run python workflows/stage0_inventory.py` |
 | [`tier_s_smoke.py`](../workflows/tier_s_smoke.py) | SyntheticCells → EncoderTrain | PyTorch; a GPU for the full size | `uv run python workflows/tier_s_smoke.py --tiny` or `--steps 300` |
 | [`stage1_retina_tier_s.py`](../workflows/stage1_retina_tier_s.py) | Loader → Split → Tokenizer → Train → Embed → Probe, with a PCA baseline and two controls | PyTorch, a GPU, and the GSE239410 files | `uv run python workflows/stage1_retina_tier_s.py --tiny`, or `--steps 3000 --ceiling 45 --seed 0` |
+| [`stage1b_retina_external.py`](../workflows/stage1b_retina_external.py) | Loader → Split → OrthologMap → Geneformer and scGPT → Probe, with PCA controls | The stage 1 needs, plus the two environments under `external/` | `uv run python workflows/stage1b_retina_external.py --with-scgpt` |
 | [`tier_m_timing.py`](../workflows/tier_m_timing.py) | SyntheticCells → EncoderTrain, at 6 layers and width 256 | PyTorch and a GPU | `uv run python workflows/tier_m_timing.py --steps 2500 --ceiling 60` |
 
 ```mermaid
@@ -151,6 +152,15 @@ Six nodes carry the first run on real cells. The graph and its benchmarks are in
 | PcaFeaturesNode | `pca_features.py` | `analysis` | The baseline: log-scaled counts projected on components fitted on training cells | `data_path` → `features_path` |
 | EmbedCellsNode | `embed_cells.py` | `analysis` | One vector per cell from the encoder; `random_init` gives the untrained control | `tokens_path`, `checkpoint_path` → `features_path` |
 | CellTypeProbeNode | `cell_type_probe.py` | `analysis` | Logistic regression from fixed features to cell type, scored on held-out samples; `permute_labels` gives the control that must fail | `features_path`, `tokens_path` → `metrics`, `predictions_path` |
+
+Two more nodes carry stage 1b ([STAGE1B-EXTERNAL-MODELS.md](../STAGE1B-EXTERNAL-MODELS.md)):
+
+| Node | File | Stage | Does | Main inputs → outputs |
+|---|---|---|---|---|
+| OrthologMapNode | `ortholog_map.py` | `analysis` | Converts zebrafish counts to human genes: keeps a gene with exactly one human ortholog, sums genes that share one | `data_path` → `data_path`, `mapping` |
+| ExternalEmbedNode | `external_embed.py` | `analysis` | Runs a published model's `embed.py` in that model's own environment under `external/` and returns its features | `data_path` → `features_path`, `n_features` |
+
+Every workflow script has a `build()` function that makes the graph without running it. `tools/draw_workflows.py` uses it to write WORKFLOWS.md, and `--check` fails when that file is out of date.
 
 Since stage 1, EncoderTrainNode reads padded cells and a split made upstream, and computes gene logits only at the masked positions. Its speed and memory are therefore not comparable with the two runs on synthetic cells recorded earlier.
 

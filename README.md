@@ -51,13 +51,13 @@ flowchart TD
     R --> Z["zebrafish-brain-fm/"]
     C --> V["Video, in the v0.1 release"]
     Z --> P["Plans<br/>introduction, Neuro-Workflow, GPU and scale"]
-    Z --> N["nodes/ and workflows/<br/>eleven nodes, four workflows"]
+    Z --> N["nodes/ and workflows/<br/>thirteen nodes, five workflows"]
     Z --> K["Records<br/>data manifest, GPU ledger, run summaries"]
 ```
 
 ## New project: a zebrafish brain model
 
-[`zebrafish-brain-fm/`](zebrafish-brain-fm/) starts a model of the larval zebrafish brain that joins single-cell data, brain architecture and functional genomics. It holds the [introduction](zebrafish-brain-fm/README.md), the [setup](zebrafish-brain-fm/SETUP.md), a plan to build it on [Neuro-Workflow](zebrafish-brain-fm/NEURO-WORKFLOW-PLAN.md), a plan for [GPU use and scale](zebrafish-brain-fm/GPU-AND-SCALE.md) and a data manifest. Stage 0 is done for the retina: six public single-cell data sets are downloaded and recorded ([RETINA.md](zebrafish-brain-fm/RETINA.md)). The first run on real cells is done: on 10,000 retina nuclei the smallest model came close to a principal-components baseline but did not match it ([STAGE1-RETINA.md](zebrafish-brain-fm/STAGE1-RETINA.md)).
+[`zebrafish-brain-fm/`](zebrafish-brain-fm/) starts a model of the larval zebrafish brain that joins single-cell data, brain architecture and functional genomics. It holds the [introduction](zebrafish-brain-fm/README.md), the [setup](zebrafish-brain-fm/SETUP.md), a plan to build it on [Neuro-Workflow](zebrafish-brain-fm/NEURO-WORKFLOW-PLAN.md), a plan for [GPU use and scale](zebrafish-brain-fm/GPU-AND-SCALE.md) and a data manifest. Stage 0 is done for the retina: six public single-cell data sets are downloaded and recorded ([RETINA.md](zebrafish-brain-fm/RETINA.md)). The first runs on real cells are done. On 10,000 retina nuclei the smallest model came close to a principal-components baseline but did not match it ([STAGE1-RETINA.md](zebrafish-brain-fm/STAGE1-RETINA.md)). Geneformer and scGPT, used frozen through an ortholog map, beat both ([STAGE1B-EXTERNAL-MODELS.md](zebrafish-brain-fm/STAGE1B-EXTERNAL-MODELS.md)). Every workflow is drawn from its code in [WORKFLOWS.md](zebrafish-brain-fm/WORKFLOWS.md).
 
 ## Rebuild the video
 

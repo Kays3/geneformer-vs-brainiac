@@ -42,6 +42,10 @@ zebrafish-brain-fm/
   workflows/         one script per workflow
   compute/gpu-ledger.tsv  one row per GPU run
   STAGE1-RETINA.md   the first run on real cells: benchmarks, then results
+  STAGE1B-EXTERNAL-MODELS.md  Geneformer and scGPT on the same test
+  WORKFLOWS.md       every workflow as a diagram, generated from the code
+  tools/draw_workflows.py     writes WORKFLOWS.md
+  external/geneformer/, external/scgpt/   one environment per published model: setup.sh, embed.py
   compute/runs/      one summary per GPU run
   runs/              checkpoints and full metrics (not in git)
   data/MANIFEST.tsv  one row per data set: source, path, sha256, licence
@@ -74,6 +78,24 @@ A data set with an empty licence cell is not used.
 - [ ] Choose the larval stage or stages.
 - [ ] Write the stage 1 test and its baseline before any training.
 - [ ] Decide where training runs, and how much compute stage 1 may use.
+
+## 4a. Published models
+
+Each published model has its own environment, because their requirements conflict with the project's. Run each setup once on the GPU machine:
+
+```bash
+bash external/geneformer/setup.sh   # Geneformer at a pinned commit, V2-104M weights, about 3.7 GB
+bash external/scgpt/setup.sh        # scGPT from its main branch, whole-human checkpoint, about 6.8 GB
+uv run python workflows/stage1b_retina_external.py --with-scgpt
+```
+
+Both ran on 15 November 2026 on a Linux aarch64 GPU machine. scGPT is installed from its main branch and is not pinned to a commit; pin it before relying on a rerun.
+
+After changing a workflow, redraw the diagrams:
+
+```bash
+uv run python tools/draw_workflows.py
+```
 
 ## 5. Working across machines
 

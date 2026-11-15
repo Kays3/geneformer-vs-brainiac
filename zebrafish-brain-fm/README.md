@@ -8,7 +8,7 @@ This folder starts a new project: one model of the larval zebrafish brain that j
 
 Web page of this introduction: <https://claude.ai/artifact/4hozJekQgTHWnEeZTGN9VC> (private until shared; the source is `artifact/intro.html`).
 
-**Status: the first run on real cells is done, and the simple baseline won.** The smallest model was trained on 10,000 real retina nuclei and tested on held-out samples. It predicts cell type with macro F1 0.81 to 0.83 over two seeds, against 0.85 for principal components (see [STAGE1-RETINA.md](STAGE1-RETINA.md)). Stage 0 is done for six retina data sets (see [RETINA.md](RETINA.md)). Earlier runs on synthetic cells tested the code and measured speed (see [GPU-AND-SCALE.md](GPU-AND-SCALE.md)).
+**Status: two published models, used as they are, beat both the baseline and this project's own small model.** On 10,000 real retina nuclei, tested on held-out samples, cell type is predicted with macro F1 0.894 from scGPT and 0.879 from Geneformer, both trained on human cells only, against 0.853 for principal components and 0.81 to 0.83 for the tier S model trained here (see [STAGE1-RETINA.md](STAGE1-RETINA.md) and [STAGE1B-EXTERNAL-MODELS.md](STAGE1B-EXTERNAL-MODELS.md)). Stage 0 is done for six retina data sets (see [RETINA.md](RETINA.md)). Earlier runs on synthetic cells tested the code and measured speed (see [GPU-AND-SCALE.md](GPU-AND-SCALE.md)).
 
 ## Documents
 
@@ -17,6 +17,8 @@ Web page of this introduction: <https://claude.ai/artifact/4hozJekQgTHWnEeZTGN9V
 | This page | The idea, the data sources, the stages and their tests |
 | [RETINA.md](RETINA.md) | Stage 0 for the retina: the six data sets that are ready, and what the inventory found |
 | [STAGE1-RETINA.md](STAGE1-RETINA.md) | The first run on real cells: design and benchmarks fixed before the run, then the results |
+| [STAGE1B-EXTERNAL-MODELS.md](STAGE1B-EXTERNAL-MODELS.md) | Geneformer and scGPT on the same test: benchmarks fixed before the run, then the results |
+| [WORKFLOWS.md](WORKFLOWS.md) | Every workflow as a diagram, generated from the code |
 | [SETUP.md](SETUP.md) | Installing, the first commands, working across machines |
 | [NEURO-WORKFLOW-PLAN.md](NEURO-WORKFLOW-PLAN.md) | The architecture: every step a schema-defined node |
 | [nodes/README.md](nodes/README.md) | Reference for each node and workflow that exists now |
@@ -109,7 +111,7 @@ The six questions in the [repository README](../README.md) apply here from the f
 
 - Retina first is now the working scope. Whether the brain-wide sources in the table above follow, and when, is open.
 
-- Train from scratch on zebrafish, adapt a model trained on other species through orthologs, or do both and compare.
+- Train from scratch on zebrafish, adapt a model trained on other species through orthologs, or do both and compare. Stage 1b is evidence for adapting: two human-trained models, frozen and fed through an ortholog map, are ahead of the model trained here.
 - One larval stage only (6 days), or development as well.
 - Which reference space is the standard: mapzebrain or Z-Brain.
 - Where training runs. The laptop is for writing and small checks only.

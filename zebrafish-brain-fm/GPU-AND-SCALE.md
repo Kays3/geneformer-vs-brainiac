@@ -162,4 +162,16 @@ The first runs on real cells. The design, benchmarks and results are in [STAGE1-
 
 These figures cannot be set beside the two runs on synthetic cells. Real nuclei are about half as long, and since stage 1 the training node computes gene logits only at the masked positions, which cuts both time and memory.
 
-GPU time recorded so far, all stages: 1.591 GPU-hours.
+## Fourth measurement: two published models, frozen (15 November 2026)
+
+Geneformer V2-104M and scGPT whole-human embedded the same 10,000 nuclei, without training. Results are in [STAGE1B-EXTERNAL-MODELS.md](STAGE1B-EXTERNAL-MODELS.md).
+
+| Quantity | Value |
+|---|---|
+| Geneformer alone, whole workflow | 4.0 minutes |
+| Geneformer and scGPT, whole workflow | 6.1 minutes |
+| GPU-hours charged, test runs included | 0.239 |
+| Stage 1 and 1b together | 0.961 of the 2.0 ceiling |
+| Disk for the two environments and weights | about 10.5 GB |
+
+GPU time recorded so far, all stages: 1.830 GPU-hours.

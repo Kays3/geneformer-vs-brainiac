@@ -6,7 +6,7 @@ Read at commit `3a4b03b6` (14 November 2026). Neuro-Workflow is not yet publishe
 
 ## What is checked
 
-Four workflows run, built from the eleven nodes in [`nodes/`](nodes/). The fourth, [`workflows/stage1_retina_tier_s.py`](workflows/stage1_retina_tier_s.py), is the first on real cells; its graph and results are in [STAGE1-RETINA.md](STAGE1-RETINA.md). [nodes/README.md](nodes/README.md) is the reference for both.
+Five workflows run, built from the thirteen nodes in [`nodes/`](nodes/). [WORKFLOWS.md](WORKFLOWS.md) draws each one from its code. The fourth, [`workflows/stage1_retina_tier_s.py`](workflows/stage1_retina_tier_s.py), is the first on real cells; its graph and results are in [STAGE1-RETINA.md](STAGE1-RETINA.md). [nodes/README.md](nodes/README.md) is the reference for both.
 
 [`workflows/stage0_inventory.py`](workflows/stage0_inventory.py) reads the data manifest, reports which data sets may be used, and verifies their files. On 15 November 2026, with the retina data in place, it reported 6 ready and verified and 10 blocked.
 
@@ -87,7 +87,8 @@ flowchart TD
 1. Settle gaps 1 and 4.
 2. Stage 0 is done for six retina data sets ([RETINA.md](RETINA.md)). Ten sources remain blocked in the manifest.
 3. Done: the stage 1 nodes and a tier S run on 10,000 real retina nuclei of one data set. The baseline won ([STAGE1-RETINA.md](STAGE1-RETINA.md)).
-4. Write the gene identifier map node: the six retina data sets use four kinds of identifier. A test on labels from a second study needs it.
+4. Done: Geneformer and scGPT on the same test, each run in its own environment through one node ([STAGE1B-EXTERNAL-MODELS.md](STAGE1B-EXTERNAL-MODELS.md)). Both beat the baseline.
+4a. Write the gene identifier map node: the six retina data sets use four kinds of identifier. A test on labels from a second study needs it.
 5. Rerun stage 1 on all 137,490 nuclei, with the benchmarks unchanged.
 
 ## Sources
