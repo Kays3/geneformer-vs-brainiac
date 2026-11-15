@@ -1,0 +1,15 @@
+[1] This video puts two biomedical foundation models side by side. Gene former reads single cells. Brainiac reads brain M R I. They do not compete, so this is a comparison of what each one is, how each one is used, and how each one is tested. Everything here comes from published sources.
+
+[2] First, what each model sees. Gene former reads one cell as a list of genes, ranked by expression. It was pretrained on about thirty million single cell transcriptomes, and now on more than one hundred million. Brainiac reads one three D brain scan, cut into patches. It is a vision transformer with twelve layers, pretrained by contrastive learning. Its paper reports forty eight thousand nine hundred and sixty five scans for training and validation.
+
+[3] Second, how each one is put to work. The Gene former protocol starts with zero shot embeddings, then fine tunes on one task or several, and then runs in silico perturbation: repress or activate a gene, and measure how the cell embedding moves. Brainiac keeps one backbone and adds one small head per task. Its repository carries seven tasks, from brain age to tumour segmentation.
+
+[4] Third, what each paper claims. Both make the same kind of claim: pretraining helps most when labelled data are scarce. Gene former adds a second claim, that in silico perturbation can point to candidate therapeutic targets. Brainiac reports that it beats supervised training and other pretrained models, most of all in few shot settings.
+
+[5] Fourth, how each model explains itself. Gene former uses in silico perturbation. The output is a shift in the model's embedding of a cell, so it is a prediction, not an experiment. Brainiac uses saliency maps taken from attention. A saliency map shows where the model looked, not why the outcome happens. In one case the unit of explanation is a gene. In the other it is a brain region.
+
+[6] Fifth, the questions I would ask of either model. Is the test split by donor or patient, not by cell or scan? Does the classifier fail when labels are permuted? Do random genes, or random brain regions, score as often as the reported ones? Does a second site give the same answer? Does the result survive a change of seed, hardware, precision or model size? And were the benchmarks fixed before the run? These are questions, not findings about either model.
+
+[7] Sixth, access. Gene former's model and code are on Hugging Face, with a published protocol. Brainiac's code is on Git Hub, with weights by download link and a licence for non commercial academic research only.
+
+[8] To close. This is not a head to head. The data, the tasks and the metrics differ. But both models follow one recipe: self supervised pretraining, then light adaptation where labels are scarce. And both explain themselves with a signal from inside the model, which needs a null control before it is read as biology. The next step in this repository is to run the Brainiac quickstart on public sample data, and try those questions on it.
