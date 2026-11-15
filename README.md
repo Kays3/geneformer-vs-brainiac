@@ -45,7 +45,7 @@ It is not a head-to-head. The two models share no data, no task and no metric. N
 
 ## New project: a zebrafish brain model
 
-[`zebrafish-brain-fm/`](zebrafish-brain-fm/) starts a model of the larval zebrafish brain that joins single-cell data, brain architecture and functional genomics. It holds the [introduction](zebrafish-brain-fm/README.md), the [setup](zebrafish-brain-fm/SETUP.md) and a data manifest. It is a plan: nothing is trained yet.
+[`zebrafish-brain-fm/`](zebrafish-brain-fm/) starts a model of the larval zebrafish brain that joins single-cell data, brain architecture and functional genomics. It holds the [introduction](zebrafish-brain-fm/README.md), the [setup](zebrafish-brain-fm/SETUP.md), a plan to build it on [Neuro-Workflow](zebrafish-brain-fm/NEURO-WORKFLOW-PLAN.md), a plan for [GPU use and scale](zebrafish-brain-fm/GPU-AND-SCALE.md) and a data manifest. It is a plan: nothing is trained yet.
 
 ## Rebuild the video
 

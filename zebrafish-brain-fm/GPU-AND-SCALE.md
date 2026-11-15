@@ -1,0 +1,63 @@
+# Plan: GPU use and scale
+
+No timing has been measured. Every figure below is either arithmetic from a stated assumption or a number to be measured. No GPU-hour estimate is given, because none can be defended before a timed run.
+
+## Scale of the data
+
+| Quantity | Value | Basis |
+|---|---|---|
+| Cells in the two largest atlases | about 710,000 | 220,000 (Raj 2020) + 489,686 (Daniocell) |
+| Tokens per cell | up to 2,048 | Assumption: a ranked gene list cut at 2,048 genes |
+| Tokens per pass over the data | up to 1.45 billion | 710,000 x 2,048 |
+| Gene vocabulary | about 30,000 | Assumption, to be fixed at stage 0 from the genome annotation |
+| Stage 3 gene screens | 2,772 | 132 mutated genes, each with 20 matched random genes: 132 x 21 |
+
+Most cells express fewer than 2,048 genes, so the real token count is lower. Measure it at stage 1.
+
+## Model sizes
+
+A transformer layer of width d has about 12 d² weights. The gene embedding adds vocabulary x d.
+
+| Tier | Layers | Width | Layer weights | Embedding | Total |
+|---|---|---|---|---|---|
+| S | 4 | 128 | 0.8 M | 3.8 M | about 5 M |
+| M | 6 | 256 | 4.7 M | 7.7 M | about 12 M |
+| L | 12 | 512 | 37.7 M | 15.4 M | about 53 M |
+
+## Tiers
+
+| Tier | Data | Hardware | Purpose | Go on when |
+|---|---|---|---|---|
+| S | 10,000 cells | Laptop, no GPU | Prove that every node and every test runs end to end | The whole stage 1 workflow passes, baseline included |
+| M | All zebrafish cells | One GPU | The first real model | It beats the baseline on held-out animals, and the permuted-label run fails as it should |
+| L | Zebrafish plus other species through orthologs | Several GPUs or a cluster | Test whether more data helps | Tier M has passed, and the ortholog map is validated |
+
+With about 710,000 cells, tier L on zebrafish alone is likely to overfit. Tier L is for the cross-species question, not for a larger zebrafish-only model.
+
+## Rules for GPU use
+
+1. **A ceiling first.** Set a GPU-hour ceiling for each stage before its first run. Do not raise it during the stage.
+2. **A ledger.** Every GPU run adds a row to [`compute/gpu-ledger.tsv`](compute/gpu-ledger.tsv): date, stage, run, hardware, hours, ceiling, output check. Failed runs count.
+3. **A start check.** Before a full run, time a short one (for example 200 steps), project the total and print it beside the ceiling. If the projection exceeds the ceiling, the run does not start.
+4. **A stop in the runner.** The runner stops itself at the ceiling.
+5. **Check before you charge.** Look at the output of a run before recording it as done: outputs are not all zero, not all equal, and of the expected count.
+6. **One job at a time** on a GPU, with checkpoints so that a stopped run resumes.
+7. **Precision.** Mixed precision is acceptable for training. For gene removal in stage 3, use full precision until a comparison on a sample of genes shows that reduced precision gives the same shifts.
+8. **Seeds.** Repeat one training run with a second seed before reading any difference between models.
+
+## GPU work inside Neuro-Workflow
+
+- A training node launches the job, waits, and returns the checkpoint path, its sha256 and the hours used. Model weights do not travel through ports.
+- The start check is its own node, placed before the training node, so that the graph cannot train without it.
+- A ledger node appends the row after the output check node passes.
+- The workflow context declares what a run needs. `resource_requirements` with `cpus` and `memory_gb` is in the Neuro-Workflow schema documentation; whether a GPU field is honoured is to be checked.
+
+## To measure before any ceiling is set
+
+- Tokens per cell, from the real data.
+- Steps per second for tier S on a laptop and tier M on the chosen GPU.
+- Peak memory at the chosen batch size.
+- Disk space for raw and tokenized data.
+- Seconds per gene screen in stage 3, from three timed screens.
+
+The tiers, the rules and the assumptions are the author's proposal.
