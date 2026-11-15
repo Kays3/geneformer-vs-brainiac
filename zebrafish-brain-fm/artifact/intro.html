@@ -4,6 +4,7 @@
 <style>
 /* Layout: one reading column; the three data layers keep one hue each from diagram to tables. */
 :root {
+  --chart-base: #00897b; --chart-model: #2f46a8; --chart-ctl: #8a93a6; --ok: #1b7a43; --bad: #b3261e;
   --bg: #f5f7fb; --surface: #ffffff; --fg: #141b2d; --muted: #5a6478; --line: #d5dbe7;
   --cells: #2f46a8; --arch: #0c7a70; --func: #a55f12; --warn-bg: #fdf3dd;
   --display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
@@ -11,9 +12,11 @@
   --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --chart-base: #22a898; --chart-model: #6f86ee; --chart-ctl: #6b7590; --ok: #5fd08f; --bad: #ff8a80;
   --bg: #0e1422; --surface: #161e31; --fg: #e8ecf5; --muted: #9aa5bb; --line: #2b3550;
   --cells: #8fa3ff; --arch: #4fd1c1; --func: #f0b25e; --warn-bg: #2a2413; color-scheme: dark } }
 :root[data-theme="dark"] {
+  --chart-base: #22a898; --chart-model: #6f86ee; --chart-ctl: #6b7590; --ok: #5fd08f; --bad: #ff8a80;
   --bg: #0e1422; --surface: #161e31; --fg: #e8ecf5; --muted: #9aa5bb; --line: #2b3550;
   --cells: #8fa3ff; --arch: #4fd1c1; --func: #f0b25e; --warn-bg: #2a2413; color-scheme: dark }
 body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6;
@@ -54,6 +57,17 @@ ul { margin: 0; padding-left: 1.2em; max-width: 66ch; display: flex; flex-direct
 pre { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 13.5px; line-height: 1.55; }
 .src { font-size: 14px; color: var(--muted); }
 .src li { max-width: 80ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.legend span::before { content: ""; display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; background: var(--sw); }
+svg .val { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+svg .row { font-size: 13px; }
+svg .grid { stroke: var(--line); stroke-width: 1; }
+svg .chance { stroke: var(--fg); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.pass { color: var(--ok); font-weight: 600; } .fail { color: var(--bad); font-weight: 600; }
+.headline { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.headline div { border-top: 2px solid var(--line); padding-top: 8px; min-width: 0; }
+.headline b { display: block; font-family: var(--display); font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.headline span { font-size: 13px; color: var(--muted); }
 @media (max-width: 520px) { ol.stages li { grid-template-columns: 1fr; } }
 </style>
 
@@ -62,12 +76,72 @@ pre { margin: 0; background: var(--surface); border: 1px solid var(--line); bord
   <span class="eyebrow">Project introduction · <i>Danio rerio</i>, larval brain</span>
   <h1>A foundation model of the zebrafish brain</h1>
   <p class="lede">One model that joins what each cell expresses, where cells sit in the brain, and what happens when a gene is removed.</p>
-  <p class="status"><strong>Status: stage 0 is done for the retina; there are no results about zebrafish yet.</strong> Six public single-cell data sets of the zebrafish retina are downloaded, checksummed and recorded. No model has seen them. Two model sizes have been trained on synthetic cells only.</p>
+  <p class="status"><strong>Status: the first run on real cells is done, and the simple baseline won.</strong> The smallest model was trained on 10,000 real retina nuclei and tested on held-out samples. It came close to a principal-components baseline but did not match it.</p>
+</section>
+
+<section>
+  <h2>First result on real cells</h2>
+  <p>The smallest model (4 layers, 3.3 M weights) was trained on 7,731 nuclei of the zebrafish retina and tested on 2,269 nuclei from three samples it never saw. The test: predict the cell type of a nucleus from the model's representation of it. The benchmarks were fixed and committed before the run.</p>
+  <div class="headline">
+    <div><b>0.853</b><span>PCA baseline, macro F1</span></div>
+    <div><b>0.81 to 0.83</b><span>Model, macro F1, two seeds</span></div>
+    <div><b>0.57</b><span>Same model, untrained</span></div>
+    <div><b>0.04</b><span>Permuted labels (chance 0.07)</span></div>
+  </div>
+  <figure>
+    <div class="legend"><span style="--sw:var(--chart-base)">Baseline</span><span style="--sw:var(--chart-model)">Trained model</span><span style="--sw:var(--chart-ctl)">Controls</span></div>
+    <div class="scroll">
+    <svg viewBox="0 0 820 300" role="img" aria-label="Macro F1 for cell type on held-out samples: PCA baseline 0.853, model 0.826 and 0.808, untrained model 0.566 and 0.577, permuted labels 0.038 and 0.040, chance 0.071.">
+      <line class="grid" x1="210" y1="16" x2="210" y2="276"/><line class="grid" x1="340" y1="16" x2="340" y2="276"/><line class="grid" x1="470" y1="16" x2="470" y2="276"/><line class="grid" x1="600" y1="16" x2="600" y2="276"/><line class="grid" x1="730" y1="16" x2="730" y2="276"/>
+      <text class="lab" x="210" y="292" text-anchor="middle">0</text><text class="lab" x="340" y="292" text-anchor="middle">0.25</text><text class="lab" x="470" y="292" text-anchor="middle">0.50</text><text class="lab" x="600" y="292" text-anchor="middle">0.75</text><text class="lab" x="730" y="292" text-anchor="middle">1.00</text>
+      <text class="row" x="200" y="41" text-anchor="end">PCA baseline</text>
+      <path d="M210,28 h439.6 a4 4 0 0 1 4 4 v10 a4 4 0 0 1 -4 4 h-439.6 z" style="fill:var(--chart-base)"><title>PCA baseline: macro F1 0.853</title></path>
+      <text class="val" x="660" y="41">0.853</text>
+      <text class="row" x="200" y="81" text-anchor="end">Model, seed 0</text>
+      <path d="M210,68 h425.5 a4 4 0 0 1 4 4 v10 a4 4 0 0 1 -4 4 h-425.5 z" style="fill:var(--chart-model)"><title>Model, seed 0: macro F1 0.826</title></path>
+      <text class="val" x="646" y="81">0.826</text>
+      <text class="row" x="200" y="113" text-anchor="end">Model, seed 1</text>
+      <path d="M210,100 h416.2 a4 4 0 0 1 4 4 v10 a4 4 0 0 1 -4 4 h-416.2 z" style="fill:var(--chart-model)"><title>Model, seed 1: macro F1 0.808</title></path>
+      <text class="val" x="637" y="113">0.808</text>
+      <text class="row" x="200" y="153" text-anchor="end">Untrained, seed 0</text>
+      <path d="M210,140 h290.3 a4 4 0 0 1 4 4 v10 a4 4 0 0 1 -4 4 h-290.3 z" style="fill:var(--chart-ctl)"><title>Untrained model, seed 0: macro F1 0.566</title></path>
+      <text class="val" x="511" y="153">0.566</text>
+      <text class="row" x="200" y="185" text-anchor="end">Untrained, seed 1</text>
+      <path d="M210,172 h296 a4 4 0 0 1 4 4 v10 a4 4 0 0 1 -4 4 h-296 z" style="fill:var(--chart-ctl)"><title>Untrained model, seed 1: macro F1 0.577</title></path>
+      <text class="val" x="517" y="185">0.577</text>
+      <text class="row" x="200" y="225" text-anchor="end">Permuted labels, seed 0</text>
+      <path d="M210,212 h15.8 a4 4 0 0 1 4 4 v10 a4 4 0 0 1 -4 4 h-15.8 z" style="fill:var(--chart-ctl)"><title>Permuted labels, seed 0: macro F1 0.038</title></path>
+      <text class="val" x="258" y="225">0.038</text>
+      <text class="row" x="200" y="257" text-anchor="end">Permuted labels, seed 1</text>
+      <path d="M210,244 h16.8 a4 4 0 0 1 4 4 v10 a4 4 0 0 1 -4 4 h-16.8 z" style="fill:var(--chart-ctl)"><title>Permuted labels, seed 1: macro F1 0.040</title></path>
+      <text class="val" x="258" y="257">0.040</text>
+      <line class="chance" x1="246.9" y1="16" x2="246.9" y2="276"/>
+      <text class="lab" x="251" y="24">chance 0.071</text>
+    </svg>
+    </div>
+    <figcaption>Macro F1 for cell type on the three held-out samples, 14 cell types. Higher is better. The trained model sits just below the baseline and far above its own untrained copy.</figcaption>
+  </figure>
+  <div class="scroll"><table>
+    <thead><tr><th>Benchmark, fixed before the run</th><th>Seed 0</th><th>Seed 1</th></tr></thead>
+    <tbody>
+      <tr><td>Model at least as good as the PCA baseline</td><td><span class="fail">&#10007; Failed</span> (0.826 against 0.853)</td><td><span class="fail">&#10007; Failed</span> (0.808 against 0.853)</td></tr>
+      <tr><td>Training adds something over the untrained model</td><td><span class="pass">&#10003; Passed</span> (0.826 against 0.566)</td><td><span class="pass">&#10003; Passed</span> (0.808 against 0.577)</td></tr>
+      <tr><td>Permuted labels fall below twice chance (0.143)</td><td><span class="pass">&#10003; Passed</span> (0.038)</td><td><span class="pass">&#10003; Passed</span> (0.040)</td></tr>
+      <tr><td>Masked-gene loss below the gene-frequency baseline (8.931)</td><td><span class="pass">&#10003; Passed</span> (4.545)</td><td><span class="pass">&#10003; Passed</span> (4.708)</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><strong>The baseline wins.</strong> The gap is 0.03 to 0.05 in macro F1. For seed 0 the 95% interval of the difference includes zero (-0.062 to 0.009); for seed 1 it does not (-0.079 to -0.014).</li>
+    <li><strong>The labels are not independent.</strong> They come from the authors' own analysis of the same expression data, which used principal components, so the baseline starts close to them.</li>
+    <li><strong>Rare types are few.</strong> The held-out samples hold 8 microglia and 19 each of three progenitor types. Accuracy over all nuclei is 0.955 to 0.968 for model and baseline alike.</li>
+    <li><strong>Scope.</strong> One tissue, one data set, one small model trained for 16 minutes, two seeds. It does not say what more nuclei or a larger model would do.</li>
+    <li><strong>Cost.</strong> 0.722 of the 2.0 GPU-hours set for stage 1.</li>
+  </ul>
 </section>
 
 <section>
   <h2>Where the work stands</h2>
-  <p class="src">As of 15 November 2026, 07:00 UTC.</p>
+  <p class="src">As of 15 November 2026, 10:50 UTC.</p>
   <div class="scroll"><table>
     <thead><tr><th>State</th><th>Item</th><th>Detail</th></tr></thead>
     <tbody>
@@ -77,14 +151,16 @@ pre { margin: 0; background: var(--surface); border: 1px solid var(--line); bord
       <tr><td><span class="tag a">DONE</span></td><td>Tier S smoke test</td><td>4.9 M weights on synthetic cells, 300 steps in 178 s, held-out loss below both baselines</td></tr>
       <tr><td><span class="tag a">DONE</span></td><td>Tier M calibration</td><td>12.9 M weights, 12 steps: 0.85 steps per second, 14.75 GB peak GPU memory</td></tr>
       <tr><td><span class="tag a">DONE</span></td><td>Tier M timing run</td><td>2,500 steps on synthetic cells in 48 minutes: 0.87 steps per second, 14.8 GB peak, held-out loss 9.591 against a baseline of 10.127</td></tr>
+      <tr><td><span class="tag a">DONE</span></td><td>Stage 1, first run on real cells</td><td>Tier S on 10,000 retina nuclei, split by sample, two seeds. The PCA baseline won by 0.03 to 0.05 in macro F1</td></tr>
+      <tr><td><span class="tag c">NEXT</span></td><td>Stage 1 on all 137,490 nuclei</td><td>Same split and benchmarks, inside the remaining 1.278 GPU-hours</td></tr>
       <tr><td><span class="tag c">NEXT</span></td><td>Gene identifier map</td><td>The six retina data sets use four kinds of gene identifier and cannot share a vocabulary yet</td></tr>
       <tr><td><span class="tag c">NEXT</span></td><td>Data statements</td><td>Read the data statement of each retina paper. The recorded licence is NCBI's general policy</td></tr>
       <tr><td><span class="tag c">NEXT</span></td><td>The ten blocked sources</td><td>Retina chromatin data and the brain-wide atlases: terms not read, not downloaded</td></tr>
       <tr><td><span class="tag c">NEXT</span></td><td>Neuro-Workflow stage names</td><td>Agree names for tokenizing and training with its maintainers</td></tr>
-      <tr><td><span class="tag c">NOT STARTED</span></td><td>Any model on real cells</td><td>No quality filter, no training, no zebrafish result, no baseline comparison on real data</td></tr>
+      <tr><td><span class="tag c">NOT STARTED</span></td><td>Brain architecture and functional genomics layers</td><td>No region data, no chromatin data, no gene-removal test yet</td></tr>
     </tbody>
   </table></div>
-  <p>GPU time used so far, all on synthetic cells: 0.869 GPU-hours in the ledger (0.051 for the tier S smoke test, 0.818 for tier M).</p>
+  <p>GPU time used so far: 1.591 GPU-hours in the ledger (0.869 on synthetic cells, 0.722 on real retina nuclei).</p>
 </section>
 
 <section>

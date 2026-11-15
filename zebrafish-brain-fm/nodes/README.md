@@ -2,7 +2,7 @@
 
 Reference for what exists now. Each node is one file in this folder and one class with a `NODE_DEFINITION`. The definitions in the code are the source of truth; this page repeats them for reading.
 
-All five nodes ran on 15 November 2026. None has unit tests yet.
+All eleven nodes ran on 15 November 2026. None has unit tests yet. `rank_encoder.py` is not a node: it holds the model that the training and embedding nodes share.
 
 ## Workflows
 
@@ -10,6 +10,7 @@ All five nodes ran on 15 November 2026. None has unit tests yet.
 |---|---|---|---|
 | [`stage0_inventory.py`](../workflows/stage0_inventory.py) | ManifestLoader → ManifestCheck → ManifestVerify | Neuro-Workflow only | `uv run python workflows/stage0_inventory.py` |
 | [`tier_s_smoke.py`](../workflows/tier_s_smoke.py) | SyntheticCells → EncoderTrain | PyTorch; a GPU for the full size | `uv run python workflows/tier_s_smoke.py --tiny` or `--steps 300` |
+| [`stage1_retina_tier_s.py`](../workflows/stage1_retina_tier_s.py) | Loader → Split → Tokenizer → Train → Embed → Probe, with a PCA baseline and two controls | PyTorch, a GPU, and the GSE239410 files | `uv run python workflows/stage1_retina_tier_s.py --tiny`, or `--steps 3000 --ceiling 45 --seed 0` |
 | [`tier_m_timing.py`](../workflows/tier_m_timing.py) | SyntheticCells → EncoderTrain, at 6 layers and width 256 | PyTorch and a GPU | `uv run python workflows/tier_m_timing.py --steps 2500 --ceiling 60` |
 
 ```mermaid
@@ -118,8 +119,23 @@ Known limits:
 
 - The start check is inside this node. The GPU plan asks for a separate node.
 - The first timed steps include GPU start-up, so the projection runs high.
-- Held-out cells are the first rows of the file, not a split by animal. Synthetic cells have no animals; real data will need the split node.
+- For synthetic cells the held-out cells are the first rows of the file. For real cells the split comes from SampleSplitNode, by sample.
 - The gene-frequency baseline is the only non-trivial baseline. There is no permuted-label control, because this task has no labels.
+
+## Stage 1 nodes
+
+Six nodes carry the first run on real cells. The graph and its benchmarks are in [STAGE1-RETINA.md](../STAGE1-RETINA.md).
+
+| Node | File | Stage | Does | Main inputs → outputs |
+|---|---|---|---|---|
+| MtxAtlasLoaderNode | `mtx_atlas_loader.py` | `io` | Reads a deposited count matrix with its gene and cell tables, keeps the full matrix in a cache file, writes a random sample of cells | none → `data_path`, `n_cells`, `n_samples` |
+| SampleSplitNode | `sample_split.py` | `analysis` | Holds out whole samples, drawn with a seed from the sorted sample names | `data_path` → `data_path`, `heldout_samples`, `n_heldout_cells` |
+| RankTokenizerNode | `rank_tokenizer.py` | `analysis` | Ranks each cell's genes by scaled expression; the scaling and the vocabulary use training cells only | `data_path` → `tokens_path`, `vocab_size`, `median_genes_per_cell` |
+| PcaFeaturesNode | `pca_features.py` | `analysis` | The baseline: log-scaled counts projected on components fitted on training cells | `data_path` → `features_path` |
+| EmbedCellsNode | `embed_cells.py` | `analysis` | One vector per cell from the encoder; `random_init` gives the untrained control | `tokens_path`, `checkpoint_path` → `features_path` |
+| CellTypeProbeNode | `cell_type_probe.py` | `analysis` | Logistic regression from fixed features to cell type, scored on held-out samples; `permute_labels` gives the control that must fail | `features_path`, `tokens_path` → `metrics`, `predictions_path` |
+
+Since stage 1, EncoderTrainNode reads padded cells and a split made upstream, and computes gene logits only at the masked positions. Its speed and memory are therefore not comparable with the two runs on synthetic cells recorded earlier.
 
 ## Adding a node
 

@@ -145,3 +145,21 @@ What it shows:
 The two held-out losses cannot be compared as "tier M is better": the tier M run had eight times the steps and twice the cells. No conclusion about model size follows.
 
 GPU time recorded so far, all on synthetic cells: 0.869 GPU-hours.
+
+## Third measurement: tier S on real retina nuclei (15 November 2026)
+
+The first runs on real cells. The design, benchmarks and results are in [STAGE1-RETINA.md](STAGE1-RETINA.md); this section gives only the cost.
+
+| Quantity | Value |
+|---|---|
+| Model | 4 layers, width 128, 3,315,072 weights (vocabulary of 17,651 genes) |
+| Data | 7,731 training and 2,269 held-out nuclei; median of 1,013 gene tokens per training nucleus |
+| Steps | 3,000 of 3,000 per seed, batch of 32, two seeds |
+| Training time | 987.5 s and 987.7 s: 3.04 steps per second |
+| Peak GPU memory | 8.24 GB |
+| Start check | Projected 1,087 s and 1,104 s against a 2,700 s ceiling |
+| GPU-hours charged | 0.722 of the 2.0 ceiling for stage 1, tiny test included |
+
+These figures cannot be set beside the two runs on synthetic cells. Real nuclei are about half as long, and since stage 1 the training node computes gene logits only at the masked positions, which cuts both time and memory.
+
+GPU time recorded so far, all stages: 1.591 GPU-hours.

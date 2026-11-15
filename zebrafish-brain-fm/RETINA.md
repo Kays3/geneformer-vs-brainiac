@@ -1,6 +1,6 @@
 # Stage 0 for the zebrafish retina
 
-The project starts with the retina. Stage 0 is done for six public single-cell data sets: each is downloaded, checksummed, inspected and recorded in [`data/MANIFEST.tsv`](data/MANIFEST.tsv). No model has seen these data yet.
+The project starts with the retina. Stage 0 is done for six public single-cell data sets: each is downloaded, checksummed, inspected and recorded in [`data/MANIFEST.tsv`](data/MANIFEST.tsv). One of them, the Lyu 2023 set, has been used for the first run on real cells ([STAGE1-RETINA.md](STAGE1-RETINA.md)). The other five have not been used.
 
 Done on 15 November 2026. Article details are from PubMed; accessions, file names and sizes are from NCBI GEO; the counts below were read from the downloaded files.
 

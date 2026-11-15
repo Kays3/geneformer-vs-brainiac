@@ -1,0 +1,84 @@
+{
+  "run": "stage1-retina-tier-s-seed1",
+  "command": "uv run python -u workflows/stage1_retina_tier_s.py --steps 3000 --ceiling 45 --seed 1",
+  "seed": 1,
+  "data": "GSE239410 single-nucleus RNA (Lyu et al. 2023): 10,000 nuclei drawn with seed 0, split by sample",
+  "heldout_samples": [
+    "Control_2",
+    "LD_96hr",
+    "NMDA_96hr"
+  ],
+  "code_commit": "a14ca15",
+  "device": "NVIDIA GB10",
+  "precision": "fp32",
+  "weights": 3315072,
+  "vocab_size": 17651,
+  "train_cells": 7731,
+  "heldout_cells": 2269,
+  "median_tokens_per_train_cell": 1013,
+  "steps_planned": 3000,
+  "steps_done": 3000,
+  "batch_size": 32,
+  "status": "completed",
+  "losses_finite": true,
+  "peak_gpu_memory_gb": 8.24,
+  "baseline_gene_frequency_loss": 8.931,
+  "baseline_uniform_loss": 9.779,
+  "chance": 0.0714,
+  "classes_in_heldout": 14,
+  "heldout_cells_per_type": {
+    "AC": 390,
+    "AC_p": 19,
+    "ActivateMG": 55,
+    "BC": 651,
+    "BC_p": 19,
+    "Cone": 288,
+    "Cone_p": 120,
+    "HC": 94,
+    "Microglia": 8,
+    "RGC": 55,
+    "RGC_p": 19,
+    "RestMG": 56,
+    "Rod": 460,
+    "Rod_p": 35
+  },
+  "started_utc": "2026-11-15T07:42:29Z",
+  "finished_utc": "2026-11-15T08:03:42Z",
+  "start_check_projected_s": 1103.7,
+  "train_seconds": 987.7,
+  "steps_per_second": 3.04,
+  "loss_first10": 9.549,
+  "loss_last10": 4.692,
+  "heldout_loss": 4.708,
+  "probes": {
+    "model": {
+      "macro_f1": 0.8084,
+      "balanced_accuracy": 0.7954,
+      "accuracy": 0.9546
+    },
+    "untrained": {
+      "macro_f1": 0.5774,
+      "balanced_accuracy": 0.5797,
+      "accuracy": 0.8356
+    },
+    "pca_baseline": {
+      "macro_f1": 0.8532,
+      "balanced_accuracy": 0.8407,
+      "accuracy": 0.9678
+    },
+    "permuted_labels": {
+      "macro_f1": 0.0396,
+      "balanced_accuracy": 0.0714,
+      "accuracy": 0.2803
+    }
+  },
+  "model_minus_pca_macro_f1": {
+    "difference": -0.0446,
+    "interval_95": [
+      -0.0785,
+      -0.0139
+    ]
+  },
+  "checkpoint_sha256_first16": "4d16ba1f9437b509",
+  "checkpoint_bytes": 13276243
+}

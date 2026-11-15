@@ -6,7 +6,7 @@ Read at commit `3a4b03b6` (14 November 2026). Neuro-Workflow is not yet publishe
 
 ## What is checked
 
-Three workflows run, built from the five nodes in [`nodes/`](nodes/). [nodes/README.md](nodes/README.md) is the reference for both.
+Four workflows run, built from the eleven nodes in [`nodes/`](nodes/). The fourth, [`workflows/stage1_retina_tier_s.py`](workflows/stage1_retina_tier_s.py), is the first on real cells; its graph and results are in [STAGE1-RETINA.md](STAGE1-RETINA.md). [nodes/README.md](nodes/README.md) is the reference for both.
 
 [`workflows/stage0_inventory.py`](workflows/stage0_inventory.py) reads the data manifest, reports which data sets may be used, and verifies their files. On 15 November 2026, with the retina data in place, it reported 6 ready and verified and 10 blocked.
 
@@ -48,7 +48,7 @@ Neuro-Workflow's stage list is `io`, `neuron`, `population`, `synapse`, `connect
 | 4 Image encoder | Stack loader; 3D encoder training | `io`, then see the gap below |
 | Later: simulation | Region wiring from the atlas to a TVB connectome; whole-brain simulation; comparison with measured activity maps | `connectivity`, `simulation`, `analysis` |
 
-The stage 1 workflow, as planned. No node in this graph exists yet. The result branch and the baseline branch read the same held-out split, so the comparison is part of the graph.
+The stage 1 workflow, as first planned. The workflow that ran differs: it has no separate start-check or ledger node, and it adds two controls (untrained weights, permuted labels). See [STAGE1-RETINA.md](STAGE1-RETINA.md) for the graph as run. The result branch and the baseline branch read the same held-out split, so the comparison is part of the graph.
 
 ```mermaid
 flowchart TD
@@ -86,9 +86,9 @@ flowchart TD
 
 1. Settle gaps 1 and 4.
 2. Stage 0 is done for six retina data sets ([RETINA.md](RETINA.md)). Ten sources remain blocked in the manifest.
-3. Write the gene identifier map node: the six retina data sets use four kinds of identifier.
-4. Write the other stage 1 nodes on a 10,000-cell sample of real retina cells (tier S in the GPU plan), baseline node first.
-5. Train on real cells only after that tier S workflow runs end to end.
+3. Done: the stage 1 nodes and a tier S run on 10,000 real retina nuclei of one data set. The baseline won ([STAGE1-RETINA.md](STAGE1-RETINA.md)).
+4. Write the gene identifier map node: the six retina data sets use four kinds of identifier. A test on labels from a second study needs it.
+5. Rerun stage 1 on all 137,490 nuclei, with the benchmarks unchanged.
 
 ## Sources
 

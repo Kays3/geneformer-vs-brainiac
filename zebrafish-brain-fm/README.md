@@ -8,7 +8,7 @@ This folder starts a new project: one model of the larval zebrafish brain that j
 
 Web page of this introduction: <https://claude.ai/artifact/4hozJekQgTHWnEeZTGN9VC> (private until shared; the source is `artifact/intro.html`).
 
-**Status: stage 0 is done for the retina; there are no results about zebrafish yet.** Six public single-cell data sets of the zebrafish retina (422,539 cells or barcodes) are downloaded, checksummed, inspected and recorded (see [RETINA.md](RETINA.md)). No model has seen them. Two model sizes have been trained on synthetic cells only, to test the code and to measure speed (see [GPU-AND-SCALE.md](GPU-AND-SCALE.md)).
+**Status: the first run on real cells is done, and the simple baseline won.** The smallest model was trained on 10,000 real retina nuclei and tested on held-out samples. It predicts cell type with macro F1 0.81 to 0.83 over two seeds, against 0.85 for principal components (see [STAGE1-RETINA.md](STAGE1-RETINA.md)). Stage 0 is done for six retina data sets (see [RETINA.md](RETINA.md)). Earlier runs on synthetic cells tested the code and measured speed (see [GPU-AND-SCALE.md](GPU-AND-SCALE.md)).
 
 ## Documents
 
@@ -16,6 +16,7 @@ Web page of this introduction: <https://claude.ai/artifact/4hozJekQgTHWnEeZTGN9V
 |---|---|
 | This page | The idea, the data sources, the stages and their tests |
 | [RETINA.md](RETINA.md) | Stage 0 for the retina: the six data sets that are ready, and what the inventory found |
+| [STAGE1-RETINA.md](STAGE1-RETINA.md) | The first run on real cells: design and benchmarks fixed before the run, then the results |
 | [SETUP.md](SETUP.md) | Installing, the first commands, working across machines |
 | [NEURO-WORKFLOW-PLAN.md](NEURO-WORKFLOW-PLAN.md) | The architecture: every step a schema-defined node |
 | [nodes/README.md](nodes/README.md) | Reference for each node and workflow that exists now |

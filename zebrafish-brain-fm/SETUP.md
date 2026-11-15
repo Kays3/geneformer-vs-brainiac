@@ -41,6 +41,7 @@ zebrafish-brain-fm/
   nodes/             Neuro-Workflow nodes of this project, with a reference README
   workflows/         one script per workflow
   compute/gpu-ledger.tsv  one row per GPU run
+  STAGE1-RETINA.md   the first run on real cells: benchmarks, then results
   compute/runs/      one summary per GPU run
   runs/              checkpoints and full metrics (not in git)
   data/MANIFEST.tsv  one row per data set: source, path, sha256, licence
