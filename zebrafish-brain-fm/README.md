@@ -10,6 +10,10 @@ Web page of this introduction: <https://claude.ai/artifact/4hozJekQgTHWnEeZTGN9V
 
 **Status: two published models, used as they are, beat both the baseline and this project's own small model.** On 10,000 real retina nuclei, tested on held-out samples, cell type is predicted with macro F1 0.894 from scGPT and 0.879 from Geneformer, both trained on human cells only, against 0.853 for principal components and 0.81 to 0.83 for the tier S model trained here (see [STAGE1-RETINA.md](STAGE1-RETINA.md) and [STAGE1B-EXTERNAL-MODELS.md](STAGE1B-EXTERNAL-MODELS.md)). Stage 0 is done for six retina data sets (see [RETINA.md](RETINA.md)). Earlier runs on synthetic cells tested the code and measured speed (see [GPU-AND-SCALE.md](GPU-AND-SCALE.md)).
 
+## Interactive retina simulation
+
+[Open the zebrafish retinal patch viewer](retina-simulation/index.html) to compare wild-type activity with a simulated *synj1* perturbation. See the [simulation notes](retina-simulation/README.md) for the model assumptions and the GPU sweep.
+
 ## Documents
 
 | Read | For |
