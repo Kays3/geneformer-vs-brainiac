@@ -41,3 +41,7 @@ Anchor each participant’s timeline at the first confirmed Parkinson’s diagno
 For a 24-month prediction test, use information available at the prediction visit, include people who remain undiagnosed through follow-up, and account for incomplete follow-up and alternative diagnoses. Compare a clinical model with the same model plus BrainIAC in participants with prediagnostic T1 MRI. Serial central and peripheral markers could test hypotheses about the order of detectable changes. The initiating lesion and its date remain unknown. No participant-level prediagnostic analysis has been run.
 
 [PARS longitudinal study](https://jamanetwork.com/journals/jamaneurology/fullarticle/2630495) · [Multimodal study of brain-first and body-first hypotheses](https://doi.org/10.1093/brain/awaa238)
+
+## Sensitivity to the participant split
+
+Repeating the original five-fold analysis with seeds 0–49 reproduced the original split (seed 42). The median MRI-only AUC was 0.619, with a range of 0.500–0.667. Age and sex gave a median of 0.524 (0.409–0.598), and the combined model gave 0.591 (0.433–0.700). These ranges describe partition sensitivity conditional on the same 33 people. They do not quantify population uncertainty. [All 50 splits](results/auc-by-split.csv)

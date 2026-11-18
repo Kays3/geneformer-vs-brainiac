@@ -1,5 +1,7 @@
 """Rebuild the editable research update using python-pptx."""
+import csv
 import json
+from statistics import median
 from pathlib import Path
 
 from pptx import Presentation
@@ -86,4 +88,14 @@ for x, time, event in [
     label(s, x, 3.85, 3.7, 1.2, event, 21)
 label(s, .75, 5.15, 11.9, 1.25, "The marker crossed the threshold between the two tests. Its biological cause and the anatomical site of onset remain unknown.", 22)
 label(s, .75, 6.75, 12, .5, "Design precedent: Jennings et al., PARS cohort (2017). Example dates are hypothetical.", 15)
+s = page("Validation  /  Cognitive status at the scan visit", "AUC varied with the participant split")
+with (root / "results/auc-by-split.csv").open() as f:
+    runs = list(csv.DictReader(f))
+label(s, .75, 2.0, 12, .8, "50 stratified five-fold splits of the same 33 people", 24)
+for x, name in zip([.75, 4.85, 9.0], metrics):
+    values = [float(run[name]) for run in runs]
+    label(s, x, 3.0, 3.8, .85, name, 21, navy, True)
+    label(s, x, 3.95, 3.8, .85, f"{median(values):.2f}", 34, teal, True)
+    label(s, x, 5.0, 3.8, .7, f"Range {min(values):.2f} to {max(values):.2f}", 19)
+label(s, .75, 6.05, 11.85, 1.0, "Values show median held-out AUC and the observed range across splits. Independent validation is needed to estimate performance in new patients.", 19)
 deck.save(root / "Parkinsons-MRI-pilot.pptx")
