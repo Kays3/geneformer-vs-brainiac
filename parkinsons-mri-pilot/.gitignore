@@ -1,0 +1,6 @@
+/data/
+/aligned/
+/results/held-out-predictions.csv
+/results/aligned-scans.png
+*.ckpt
+__pycache__/

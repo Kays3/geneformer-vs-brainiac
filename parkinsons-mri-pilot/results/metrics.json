@@ -1,0 +1,14 @@
+{
+  "Age and sex": {
+    "AUROC": 0.5333333333333333,
+    "balanced_accuracy": 0.6277777777777778
+  },
+  "BrainIAC": {
+    "AUROC": 0.6592592592592592,
+    "balanced_accuracy": 0.6055555555555556
+  },
+  "Age, sex and BrainIAC": {
+    "AUROC": 0.6037037037037037,
+    "balanced_accuracy": 0.6055555555555556
+  }
+}
