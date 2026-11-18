@@ -64,4 +64,15 @@ for y, heading, words in [
     (5.36, "Test motor progression separately", "Link baseline MRI to 24-month MDS-UPDRS Part III motor scores and medication state in an approved PPMI dataset. Compare imaging against a baseline clinical forecast.")]:
     label(s,.75,y,3.8,1.3,heading,23,teal,True)
     label(s,4.8,y,7.75,1.45,words,21)
+s = page("Published PPMI cohort  /  External reference", "Motor examination scores over 24 months")
+label(s, .75, 2.05, 12, .8, "Mean MDS-UPDRS Part III score in the untreated + treated OFF group", 23)
+for x, visit, mean, count in [
+    (.75, "Baseline", "20.89", 423), (3.9, "6 months", "24.87", 400),
+    (7.05, "12 months", "25.10", 334), (10.2, "24 months", "27.13", 282)
+]:
+    label(s, x, 3.1, 2.7, .5, visit, 20)
+    label(s, x, 3.7, 2.7, .85, mean, 35, teal, True)
+    label(s, x, 4.65, 2.8, .6, f"{count} exams", 17)
+label(s, .75, 5.65, 11.85, .95, "The group mean rose by 6.24 points. Different numbers contributed at each visit. Individual change requires paired records.", 21)
+label(s, .75, 6.85, 12, .44, "Simuni et al., Movement Disorders (2018), Table 2. DOI 10.1002/mds.27361", 14)
 deck.save(root / "Parkinsons-MRI-pilot.pptx")

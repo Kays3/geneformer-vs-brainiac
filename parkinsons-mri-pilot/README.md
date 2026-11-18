@@ -29,3 +29,7 @@ The public results folder contains aggregate metrics and a receiver operating ch
 ## Update the slides with each run
 
 After running the evaluation, use `python build_slides.py` with python-pptx installed to refresh the table and ROC figure. Review cohort counts, methods and interpretation when the experiment changes. Export the reviewed PowerPoint to PDF and commit the slides, aggregate results and analysis changes together.
+
+## Published 24-month motor trajectory
+
+In a separate early Parkinson’s cohort, Simuni et al. reported mean MDS-UPDRS Part III scores of 20.89 at baseline (423 exams), 24.87 at six months (400), 25.10 at 12 months (334) and 27.13 at 24 months (282) for their untreated + treated OFF group. These visit means summarize available exams. Estimating individual changes requires paired scores and medication-state information. Testing a BrainIAC forecast additionally requires baseline MRI from those same participants. [Table 2, Simuni et al.](https://pmc.ncbi.nlm.nih.gov/articles/PMC6001458/#mds27361-tbl-0002)
