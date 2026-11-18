@@ -75,4 +75,15 @@ for x, visit, mean, count in [
     label(s, x, 4.65, 2.8, .6, f"{count} exams", 17)
 label(s, .75, 5.65, 11.85, .95, "The group mean rose by 6.24 points. Different numbers contributed at each visit. Individual change requires paired records.", 21)
 label(s, .75, 6.85, 12, .44, "Simuni et al., Movement Disorders (2018), Table 2. DOI 10.1002/mds.27361", 14)
+s = page("Proposed study  /  Before diagnosis", "How early was a change detectable?")
+label(s, .75, 2.0, 12, .78, "Illustrative smell-test timeline for one participant", 23, teal, True)
+for x, time, event in [
+    (.75, "−36 months", "Test within reference range"),
+    (4.85, "−18 months", "First abnormal test"),
+    (9.05, "Month 0", "Clinical PD diagnosis"),
+]:
+    label(s, x, 3.0, 3.7, .65, time, 28, navy, True)
+    label(s, x, 3.85, 3.7, 1.2, event, 21)
+label(s, .75, 5.15, 11.9, 1.25, "The marker crossed the threshold between the two tests. Its biological cause and the anatomical site of onset remain unknown.", 22)
+label(s, .75, 6.75, 12, .5, "Design precedent: Jennings et al., PARS cohort (2017). Example dates are hypothetical.", 15)
 deck.save(root / "Parkinsons-MRI-pilot.pptx")

@@ -33,3 +33,11 @@ After running the evaluation, use `python build_slides.py` with python-pptx inst
 ## Published 24-month motor trajectory
 
 In a separate early Parkinson’s cohort, Simuni et al. reported mean MDS-UPDRS Part III scores of 20.89 at baseline (423 exams), 24.87 at six months (400), 25.10 at 12 months (334) and 27.13 at 24 months (282) for their untreated + treated OFF group. These visit means summarize available exams. Estimating individual changes requires paired scores and medication-state information. Testing a BrainIAC forecast additionally requires baseline MRI from those same participants. [Table 2, Simuni et al.](https://pmc.ncbi.nlm.nih.gov/articles/PMC6001458/#mds27361-tbl-0002)
+
+## Proposed study of signs before diagnosis
+
+Anchor each participant’s timeline at the first confirmed Parkinson’s diagnosis and plot dated smell tests, motor exams, dopamine-transporter imaging and any available earlier MRI. Record the last normal and first abnormal visit separately for each marker. If the earliest test is already abnormal, report that the change predates that visit. Define thresholds before examining outcomes and distinguish recalled symptoms from dated measurements.
+
+For a 24-month prediction test, use information available at the prediction visit, include people who remain undiagnosed through follow-up, and account for incomplete follow-up and alternative diagnoses. Compare a clinical model with the same model plus BrainIAC in participants with prediagnostic T1 MRI. Serial central and peripheral markers could test hypotheses about the order of detectable changes. The initiating lesion and its date remain unknown. No participant-level prediagnostic analysis has been run.
+
+[PARS longitudinal study](https://jamanetwork.com/journals/jamaneurology/fullarticle/2630495) · [Multimodal study of brain-first and body-first hypotheses](https://doi.org/10.1093/brain/awaa238)
