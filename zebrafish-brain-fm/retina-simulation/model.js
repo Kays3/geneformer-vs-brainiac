@@ -22,7 +22,7 @@ const Retina = (() => {
   const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
   const distance = (a, b) => (a.x - b.x) ** 2 + (a.z - b.z) ** 2;
 
-  function makeGraph(seed = 17) {
+  function makeGraph(seed = 17, model = "baseline", density = 1) {
     let state = seed >>> 0;
     const random = () => {
       state = (Math.imul(1664525, state) + 1013904223) >>> 0;
@@ -31,12 +31,14 @@ const Retina = (() => {
     const nodes = [];
     const edges = [];
     function place(type, columns, rows) {
+      columns *= density;
+      rows *= density;
       const info = types[type];
       return Array.from({ length: columns * rows }, (_, i) => {
         const node = {
           id: nodes.length, type,
-          x: ((i % columns + 0.5) / columns * 2 - 1) * 1.49 + (random() - 0.5) * 0.23,
-          z: ((Math.floor(i / columns) + 0.5) / rows * 2 - 1) * 1.03 + (random() - 0.5) * 0.20,
+          x: ((i % columns + 0.5) / columns * 2 - 1) * 1.49 + (random() - 0.5) * 0.23 / density,
+          z: ((Math.floor(i / columns) + 0.5) / rows * 2 - 1) * 1.03 + (random() - 0.5) * 0.20 / density,
           y: info.depth + (random() - 0.5) * 0.08,
           cone: type === 0 ? (i + Math.floor(i / columns)) % coneClasses.length : -1
         };
@@ -75,7 +77,7 @@ const Retina = (() => {
     connect(off, ganglionOff, 4, 1.46, "inner");
     connect(amacrine, ganglionOn, 2, -0.52, "inner");
     connect(amacrine, ganglionOff, 2, -0.33, "inner");
-    return { nodes, edges };
+    return { nodes, edges, model, density };
   }
 
   function stimulusAt(stimulus, time, x) {

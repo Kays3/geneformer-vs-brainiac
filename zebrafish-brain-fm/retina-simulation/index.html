@@ -6,6 +6,8 @@
   <title>Zebrafish Retina Simulation</title>
   <link rel="stylesheet" href="style.css">
   <script defer src="model.js"></script>
+  <script defer src="tectum.js"></script>
+  <script defer src="tectal-panel.js"></script>
   <script defer src="viewer.js"></script>
 </head>
 <body>
@@ -19,8 +21,11 @@
     </header>
 
     <section class="controls" aria-label="Simulation controls">
+      <label>Spatial resolution
+        <select id="density"><option value="2" selected>Fine · 4× retinal cells</option><option value="1">Original patch</option></select>
+      </label>
       <label>Light stimulus
-        <select id="stimulus"><option value="white">Broadband flash</option><option value="uv">UV flash</option><option value="bar">Moving bright bar</option></select>
+        <select id="stimulus"><option value="white">Broadband flash</option><option value="uv">UV flash</option><option value="bar" selected>Moving bright bar</option></select>
       </label>
       <label>Perturbation
         <select id="mode"><option value="synaptic">Transmission only</option><option value="contacts" selected>Transmission + contact loss</option></select>
@@ -60,6 +65,16 @@
       <input id="time" type="range" min="0" max="2200" step="10" value="700" aria-label="Simulation time">
       <span id="lightState" class="light-state">Light on</span>
     </section>
+
+    <section class="panel" aria-labelledby="tectal-heading">
+      <div class="section-head"><div><h2 id="tectal-heading">Optic tectum</h2><p id="tectal-count"></p></div>
+        <label>Inspect site <input type="range" id="tectal-site" min="0" value="0" aria-label="Tectal site"></label></div>
+      <div class="comparison">
+        <div><h3>Wild type</h3><canvas id="tectal-wild" style="width:100%;height:155px" aria-label="Wild-type tectal map"></canvas></div>
+        <div><h3>Simulated <i>synj1</i></h3><canvas id="tectal-mutant" style="width:100%;height:155px" aria-label="Perturbed tectal map"></canvas></div></div>
+      <p id="tectal-readout"></p>
+      <canvas id="tectal-history" style="width:100%;height:95px" aria-label="Selected site response over the entire probe for both conditions"></canvas>
+      <p>Click a map or use the site slider. Brighter sites have stronger responses. Both maps use the same scale.</p></section>
 
     <div class="results">
       <section class="panel" aria-labelledby="activity-heading">

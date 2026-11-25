@@ -9,3 +9,9 @@ The simulated synj1 condition sets the upstream transmission effect to 65% and i
 ## Verification
 
 Run `node verify-tectum.js` from this directory. [ThinkStation3 results](tectum-results.json) used the published retinal baseline, three wiring seeds, three stimuli and two retinal conditions. The script checks normalization, finite nonnegative responses, axonal latency and a zero response after tract silencing. Peaks are maxima over all 45 sites and all time steps. The viewer uses seed 17.
+
+## Higher-resolution coupled view
+
+The retinal simulator home page now opens a moving-bar probe with 328 retinal cells, including 48 ganglion cells, and a 33 × 17 contralateral tectal sheet. Choose Original patch for 82 retinal cells, 12 ganglion cells and a 9 × 5 sheet. Each condition uses its own retinal outputs. Both maps and the selected site's time series share one probe clock and one amplitude scale within a run. More spatial samples increase rendering and simulation detail. The time step stays at 10 ms. Tectal sites share inputs through the assumed projection and are not independently measured neurons.
+
+Run `node verify-resolution.js` for the baseline moving-bar probe. On ThinkStation3, the mean anterior and posterior boundary-column responses peaked at 760 and 1190 ms at fine resolution (seed 17). In one CPU run, graph construction, one retinal probe and one tectal projection took 43 ms. Browser drawing and minute-scale sessions are excluded.

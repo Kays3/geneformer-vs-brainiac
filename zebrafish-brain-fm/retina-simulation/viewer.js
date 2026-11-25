@@ -1,7 +1,7 @@
 "use strict";
 
 const $ = id => document.getElementById(id);
-const graph = Retina.makeGraph();
+let graph;
 const wildColor = "#71dec2";
 const mutantColor = "#f4ad78";
 const abbreviations = ["Cone", "HC", "ON BC", "OFF BC", "AC", "ON GC", "OFF GC"];
@@ -189,6 +189,7 @@ function draw() {
   const time = Number($("time").value);
   const frame = Math.round(time / Retina.dt);
   retinaCanvases.forEach((canvas, i) => drawRetina(canvas, results[i], frame));
+  TectalPanel.draw(frame);
   $("timeValue").value = time + " ms";
   const lightOn = time >= 450 && time < 1150;
   $("lightState").textContent = lightOn ? "Light on" : "Light off";
@@ -256,7 +257,17 @@ function updateMatrix() {
   $("matrix").replaceChildren(table);
 }
 
+function clearCellSelection() {
+  selectedCell = null;
+  if ($("trace").value.startsWith("cell-")) $("trace").value = "5";
+  $("trace").querySelector('[value^="cell-"]')?.remove();
+}
+
 function updateResults() {
+  if (graph?.density !== Number($("density").value)) {
+    graph = Retina.makeGraph(17, "baseline", Number($("density").value));
+    clearCellSelection();
+  }
   const mode = $("mode").value;
   const stress = Number($("stress").value);
   const loss = Number($("loss").value);
@@ -268,6 +279,7 @@ function updateResults() {
     Retina.simulate(Retina.makeCase(graph, { stimulus })),
     Retina.simulate(Retina.makeCase(graph, { stimulus, mode, stress: stress / 100, contactLoss: loss / 100 }))
   ];
+  TectalPanel.update(results, graph.density === 2);
   const stats = results.map(Retina.summarize);
   ["wildCount", "mutantCount"].forEach((id, i) => {
     $(id).textContent = graph.nodes.length + " cells · " + stats[i].total + " contacts";
@@ -374,7 +386,7 @@ $("trace").addEventListener("change", () => {
   selectedCell = value.startsWith("cell-") ? Number(value.slice(5)) : null;
   draw();
 });
-for (const control of ["stress", "loss", "stimulus", "mode"]) $(control).addEventListener("input", scheduleResults);
+for (const control of ["density", "stress", "loss", "stimulus", "mode"]) $(control).addEventListener("input", scheduleResults);
 for (const control of ["time", "connections"]) $(control).addEventListener("input", draw);
 $("matrixView").addEventListener("input", updateMatrix);
 
