@@ -105,6 +105,7 @@ function drawRetina(canvas, result, frameIndex) {
   const values = result.frames[frameIndex];
   for (const cell of cells) {
     const { node, x, y } = cell;
+    if (result.lost?.has(node.id)) continue;
     const color = cellColor(node);
     const strength = node.type >= 5 ? Math.abs(values[node.id] - 6) / 35 : Math.abs(values[node.id]);
     const radius = (node.type === 0 ? 3.6 : 3.1) + Math.min(strength, 1) * 2;
@@ -124,7 +125,7 @@ function drawRetina(canvas, result, frameIndex) {
       ctx.stroke();
     }
   }
-  positions.set(canvas, cells);
+  positions.set(canvas, result.lost ? cells.filter(c => !result.lost.has(c.node.id)) : cells);
 
   for (const plane of planes) {
     const end = project(1.62, plane.depth, -1.09);
@@ -269,11 +270,24 @@ function updateResults() {
     clearCellSelection();
   }
   const mode = $("mode").value;
+  const degenerative = mode === "pde6c" || mode === "aipl1b";
+  const gene = degenerative ? mode : "synj1";
+  const label = mode === "wild" ? "Sham control" : "Simulated " + gene;
+  document.querySelectorAll("[data-gene-label]").forEach(el => el.textContent = label);
+  $("brain-condition").options[1].textContent = label;
+  $("stress-label").textContent = degenerative ? "Cone sensitivity loss" : "Transmission effect";
+  $("loss-label").textContent = degenerative ? "Cone loss probability" : "Contact loss probability";
+  $("stress").disabled = mode === "wild";
+  $("contact-model").textContent = degenerative
+    ? "Model severity snapshot. Lost cones and their contacts disappear. Surviving cones have reduced light sensitivity." +
+      (mode === "aipl1b" ? " Blue cones retain more sensitivity by assumption." : "")
+    : mode === "wild" ? "Sham control uses the same retinal wiring and stimulus as wild type."
+    : "Contact loss applies to modeled invaginating contacts. Drag either patch to rotate both.";
   const stress = Number($("stress").value);
   const loss = Number($("loss").value);
-  $("stressValue").value = stress + "%";
-  $("loss").disabled = mode !== "contacts";
-  $("lossValue").value = mode === "contacts" ? loss + "%" : "Off";
+  $("stressValue").value = mode === "wild" ? "Off" : stress + "%";
+  $("loss").disabled = mode !== "contacts" && !degenerative;
+  $("lossValue").value = !$("loss").disabled ? loss + "%" : "Off";
   const stimulus = $("stimulus").value;
   results = [
     Retina.simulate(Retina.makeCase(graph, { stimulus })),
@@ -282,7 +296,7 @@ function updateResults() {
   TectalPanel.update(results, graph.density === 2);
   const stats = results.map(Retina.summarize);
   ["wildCount", "mutantCount"].forEach((id, i) => {
-    $(id).textContent = graph.nodes.length + " cells · " + stats[i].total + " contacts";
+    $(id).textContent = (graph.nodes.length - (results[i].lost?.size || 0)) + " cells · " + stats[i].total + " contacts";
   });
   const metrics = [
     { label: "ON ganglion peak · 450–1,150 ms", key: "on" },
@@ -386,6 +400,7 @@ $("trace").addEventListener("change", () => {
   selectedCell = value.startsWith("cell-") ? Number(value.slice(5)) : null;
   draw();
 });
+$("mode").addEventListener("input", () => { $("brain-condition").selectedIndex = 1; });
 for (const control of ["density", "stress", "loss", "stimulus", "mode"]) $(control).addEventListener("input", scheduleResults);
 for (const control of ["time", "connections"]) $(control).addEventListener("input", draw);
 $("matrixView").addEventListener("input", updateMatrix);

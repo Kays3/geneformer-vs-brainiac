@@ -18,7 +18,7 @@
       <div class="eyebrow">DANIO RERIO / LARVAL RETINA</div>
       <h1>Zebrafish retina simulation</h1>
       <p><a href="tectum.html">Follow retinal output into the optic tectum →</a></p>
-      <p>Follow a light stimulus from cones to ganglion cells and test how a simulated <i>synj1</i> perturbation changes the response.</p>
+      <p>Follow a light stimulus from cones to ganglion cells and compare gene disruption models across the retina and optic tectum.</p>
       <div class="model-note">Schematic patch at ~6 dpf · Synthetic wiring and activity · Parameters have yet to be fitted to recordings</div>
     </header>
 
@@ -30,12 +30,12 @@
         <select id="stimulus"><option value="white">Broadband flash</option><option value="uv">UV flash</option><option value="bar" selected>Moving bright bar</option></select>
       </label>
       <label>Perturbation
-        <select id="mode"><option value="synaptic">Transmission only</option><option value="contacts" selected>Transmission + contact loss</option></select>
+        <select id="mode"><option value="synaptic">synj1 · transmission only</option><option value="contacts" selected>synj1 · transmission + contact loss</option><option value="pde6c">pde6c · cone degeneration</option><option value="aipl1b">aipl1b · cone dysfunction and loss</option><option value="wild">Sham · matched wild type</option></select>
       </label>
-      <label><span>Transmission effect <output id="stressValue">65%</output></span>
+      <label><span><b id="stress-label">Transmission effect</b> <output id="stressValue">65%</output></span>
         <input id="stress" type="range" min="0" max="100" value="65">
       </label>
-      <label><span>Contact loss probability <output id="lossValue">40%</output></span>
+      <label><span><b id="loss-label">Contact loss probability</b> <output id="lossValue">40%</output></span>
         <input id="loss" type="range" min="0" max="100" value="40" aria-describedby="contact-model">
       </label>
     </section>
@@ -54,7 +54,7 @@
           <canvas id="wildCanvas" class="retina-canvas" aria-label="Rotatable wild-type retinal patch"></canvas>
         </article>
         <article class="retina-card">
-          <div class="card-head"><h3><span class="tag mutant"></span>Simulated <i>synj1</i></h3><span id="mutantCount"></span></div>
+          <div class="card-head"><h3><span class="tag mutant"></span><span data-gene-label>Simulated synj1</span></h3><span id="mutantCount"></span></div>
           <canvas id="mutantCanvas" class="retina-canvas" aria-label="Rotatable perturbed retinal patch"></canvas>
         </article>
       </div>
@@ -73,7 +73,7 @@
         <label>Inspect site <input type="range" id="tectal-site" min="0" value="0" aria-label="Tectal site"></label></div>
       <div class="comparison">
         <div><h3>Wild type</h3><canvas id="tectal-wild" style="width:100%;height:155px" aria-label="Wild-type tectal map"></canvas></div>
-        <div><h3>Simulated <i>synj1</i></h3><canvas id="tectal-mutant" style="width:100%;height:155px" aria-label="Perturbed tectal map"></canvas></div></div>
+        <div><h3><span data-gene-label>Simulated synj1</span></h3><canvas id="tectal-mutant" style="width:100%;height:155px" aria-label="Perturbed tectal map"></canvas></div></div>
       <p id="tectal-readout"></p>
       <canvas id="tectal-history" style="width:100%;height:95px" aria-label="Selected site response over the entire probe for both conditions"></canvas>
       <p>Click a map or use the site slider. Brighter sites have stronger responses. Both maps use the same scale.</p></section>
@@ -81,7 +81,7 @@
     <div class="results">
       <section class="panel" aria-labelledby="activity-heading">
         <div class="section-head"><div><h2 id="activity-heading">Neuronal activity</h2><p>Shading marks the stimulus interval.</p></div><label>Trace <select id="trace"></select></label></div>
-        <div class="trace-legend"><span><i class="tag wild"></i>Wild type</span><span><i class="tag mutant"></i>Simulated <i>synj1</i></span></div>
+        <div class="trace-legend"><span><i class="tag wild"></i>Wild type</span><span><i class="tag mutant"></i><span data-gene-label>Simulated synj1</span></span></div>
         <canvas id="traceCanvas" aria-label="Time series comparing wild-type and simulated mutant responses"></canvas>
         <div id="metrics" class="metrics"></div>
       </section>

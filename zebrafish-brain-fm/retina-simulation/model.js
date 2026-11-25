@@ -77,7 +77,7 @@ const Retina = (() => {
     connect(off, ganglionOff, 4, 1.46, "inner");
     connect(amacrine, ganglionOn, 2, -0.52, "inner");
     connect(amacrine, ganglionOff, 2, -0.33, "inner");
-    return { nodes, edges, model, density };
+    return { nodes, edges, model, density, seed };
   }
 
   function stimulusAt(stimulus, time, x) {
@@ -89,7 +89,36 @@ const Retina = (() => {
     return 1;
   }
 
-  function makeCase(graph, { stimulus = "white", mode = "wild", stress = 0, contactLoss = 0 } = {}) {
+  function degeneration(graph, options) {
+    const {mode, stress = 0, contactLoss = 0} = options;
+    const lost = new Set();
+    const cones = graph.nodes.filter(node => node.cone >= 0);
+    // A fixed susceptibility per cone makes increasing loss nested on one graph.
+    for (const node of cones) {
+      let hash = Math.imul(node.id + 1, 0x85ebca6b) ^ (graph.seed ?? 17);
+      hash = Math.imul(hash ^ (hash >>> 16), 0xc2b2ae35);
+      if (((hash ^ (hash >>> 16)) >>> 0) / 4294967296 < contactLoss) lost.add(node.id);
+    }
+    const viable = edge => !lost.has(edge.from) && !lost.has(edge.to);
+    const scenario = makeRetinaCase({...graph, edges: graph.edges.filter(viable)}, {...options, mode:"wild"});
+    let active = 0;
+    scenario.contacts = graph.edges.map(edge => viable(edge) ? scenario.contacts[active++] :
+      {...edge, active:false, effective:0});
+    for (const node of cones) {
+      // Illustrative relative blue-cone sparing for the early gosh opsin phenotype.
+      const sensitivityLoss = mode === "aipl1b" && node.cone === 1 ? stress * 0.25 : stress;
+      const gain = lost.has(node.id) ? 0 : 1 - sensitivityLoss;
+      for (const frame of scenario.input) frame[node.id] *= gain;
+    }
+    return {...scenario, lost};
+  }
+
+  function makeCase(graph, options = {}) {
+    if (options.mode === "pde6c" || options.mode === "aipl1b") return degeneration(graph, options);
+    return makeRetinaCase(graph, options);
+  }
+
+  function makeRetinaCase(graph, { stimulus = "white", mode = "wild", stress = 0, contactLoss = 0 } = {}) {
     const { nodes, edges } = graph;
     const n = nodes.length;
     const coneCount = nodes.filter(node => node.cone >= 0).length;

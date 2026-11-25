@@ -51,7 +51,7 @@ const TectalPanel = (() => {
     ctx.font="12px system-ui";ctx.fillStyle="#c3d0df";ctx.fillText("0 ms",2,height-1);ctx.fillText(Retina.duration+" ms",width-58,height-1);
     document.getElementById("tectal-readout").textContent =
       "Site "+(1+Math.floor(index/columns))+", "+(index%columns+1)+" · Wild type (green) "+
-      projections[0].frames[frame][index].toFixed(2)+" · synj1 (orange) "+
+      projections[0].frames[frame][index].toFixed(2)+" · "+document.getElementById("brain-condition").options[1].textContent+" (orange) "+
       projections[1].frames[frame][index].toFixed(2)+" · shared scale 0–"+maxRate.toFixed(1)+" model units";
   }
   site.oninput=()=>draw(currentFrame);
