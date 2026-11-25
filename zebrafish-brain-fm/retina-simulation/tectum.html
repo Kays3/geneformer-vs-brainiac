@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Retina to optic tectum · Zebrafish</title><link rel="stylesheet" href="style.css">
+<style>
+main{max-width:1050px}a{color:#83dfce}.controls{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+svg{display:block;width:100%;height:auto}.panel{padding:18px;margin-top:18px}svg text{font-family:system-ui,sans-serif;fill:#d1dce8}.playback{display:flex;align-items:center;gap:15px;padding:12px}.playback input{flex:1;min-width:30px}
+</style><script defer src="model.js"></script><script defer src="tectum.js"></script><script defer src="tectum-view.js"></script></head>
+<body><main><header class="hero"><a href="index.html">← Retinal architecture</a><h1>Retina to optic tectum</h1><p>Follow a light response from one eye to the opposite tectal hemisphere. Select a tectal site to see its four retinal inputs.</p></header>
+<section class="controls"><label>Light stimulus<select id="light"><option value="bar">Moving bright bar</option><option value="white">Broadband flash</option><option value="uv">UV flash</option></select></label>
+<label>Retinal circuit<select id="condition"><option value="wild">Wild type</option><option value="contacts">Simulated synj1 disruption</option></select></label>
+<label>Optic tract<select id="tract"><option value="intact">Intact</option><option value="silent">Silenced</option></select></label>
+<label>Tectal site<select id="site"></select></label></section>
+<section class="panel"><svg id="map" viewBox="0 0 900 300" role="img" aria-label="Ganglion cells, selected retinal projections and tectal activity"></svg>
+<p>Brighter cells indicate stronger responses. Lines show the selected site's modeled connections. Retinal ON cells are circles and OFF cells are squares.</p></section>
+<div class="playback"><button id="play">Play</button><input id="time" aria-label="Probe time" type="range" min="0" max="2200" step="10" value="850"><output id="stamp"></output></div>
+<section class="panel"><h2>Selected tectal response</h2><svg id="trace" viewBox="0 0 900 125" role="img" aria-label="Tectal response over the probe with current time marked"></svg><output id="rate"></output></section>
+<p>Schematic feedforward model. Axonal delay, synaptic weights and response units are assumed. The temporal retina projects toward anterior tectum. <a href="https://elifesciences.org/articles/58596">Experimental retinotectal map</a></p></main></body></html>

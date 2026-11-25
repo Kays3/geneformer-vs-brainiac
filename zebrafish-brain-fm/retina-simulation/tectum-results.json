@@ -1,0 +1,110 @@
+[
+  {
+    "seed": 17,
+    "stimulus": "bar",
+    "mode": "wild",
+    "peak": 10.928241593428522
+  },
+  {
+    "seed": 17,
+    "stimulus": "bar",
+    "mode": "contacts",
+    "peak": 3.96511223130376
+  },
+  {
+    "seed": 17,
+    "stimulus": "uv",
+    "mode": "wild",
+    "peak": 11.559538181969506
+  },
+  {
+    "seed": 17,
+    "stimulus": "uv",
+    "mode": "contacts",
+    "peak": 4.928764889504263
+  },
+  {
+    "seed": 17,
+    "stimulus": "white",
+    "mode": "wild",
+    "peak": 28.637717687372323
+  },
+  {
+    "seed": 17,
+    "stimulus": "white",
+    "mode": "contacts",
+    "peak": 11.515545207797611
+  },
+  {
+    "seed": 31,
+    "stimulus": "bar",
+    "mode": "wild",
+    "peak": 10.77602576241021
+  },
+  {
+    "seed": 31,
+    "stimulus": "bar",
+    "mode": "contacts",
+    "peak": 4.007963046057521
+  },
+  {
+    "seed": 31,
+    "stimulus": "uv",
+    "mode": "wild",
+    "peak": 9.015770532667387
+  },
+  {
+    "seed": 31,
+    "stimulus": "uv",
+    "mode": "contacts",
+    "peak": 3.78922815375429
+  },
+  {
+    "seed": 31,
+    "stimulus": "white",
+    "mode": "wild",
+    "peak": 28.83888270139256
+  },
+  {
+    "seed": 31,
+    "stimulus": "white",
+    "mode": "contacts",
+    "peak": 11.250705925325324
+  },
+  {
+    "seed": 53,
+    "stimulus": "bar",
+    "mode": "wild",
+    "peak": 10.351909914720004
+  },
+  {
+    "seed": 53,
+    "stimulus": "bar",
+    "mode": "contacts",
+    "peak": 3.4191042541629137
+  },
+  {
+    "seed": 53,
+    "stimulus": "uv",
+    "mode": "wild",
+    "peak": 8.859852758370925
+  },
+  {
+    "seed": 53,
+    "stimulus": "uv",
+    "mode": "contacts",
+    "peak": 3.2030955179051266
+  },
+  {
+    "seed": 53,
+    "stimulus": "white",
+    "mode": "wild",
+    "peak": 28.461316343033584
+  },
+  {
+    "seed": 53,
+    "stimulus": "white",
+    "mode": "contacts",
+    "peak": 11.273872691911532
+  }
+]
