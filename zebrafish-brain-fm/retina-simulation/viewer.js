@@ -351,8 +351,8 @@ for (const canvas of retinaCanvases) {
     const dy = event.clientY - gesture.y;
     if (Math.hypot(dx, dy) > 4) gesture.moved = true;
     if (!gesture.moved) return;
-    view.yaw = Math.max(-0.95, Math.min(0.95, gesture.yaw + dx * 0.006));
-    view.pitch = Math.max(0.08, Math.min(0.92, gesture.pitch + dy * 0.006));
+    view.yaw = gesture.yaw + dx * 0.006;
+    view.pitch = gesture.pitch + dy * 0.006;
     draw();
   });
   canvas.addEventListener("pointerup", event => {

@@ -9,13 +9,16 @@ const WholeBrain = (() => {
     <p>Left-eye stimulation → right optic tectum · larval atlas, approximately 6 dpf</p></div></div>
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin:12px 0"><label>Response
     <select id="brain-condition"><option>Wild type</option><option>Simulated synj1</option></select></label>
-    <label>Rotate <input id="brain-angle" type="range" min="-90" max="90" value="15" aria-label="Rotate from dorsal toward lateral view"></label>
+    <label>Turn <input id="brain-turn" type="range" min="0" max="360" value="0"> <output id="turn-degrees">0°</output></label>
+    <label>Tilt <input id="brain-angle" type="range" min="0" max="360" value="15"> <output id="tilt-degrees">15°</output></label>
+    <button type="button" id="brain-reset">Reset view</button>
     <label>Anatomy opacity <input id="brain-opacity" type="range" min="0" max="100" value="55"></label></div>
-    <canvas id="brain-volume" style="width:100%;height:clamp(260px,36vw,440px);touch-action:pan-y" aria-label="Rotatable transparent atlas with simulated activity on the right tectal neuropil"></canvas>
-    <p>Contours show forebrain (green), midbrain (blue), hindbrain (violet) and retinas (gray). Amber marks modeled tectal activity. The white ring follows the site selected on the map below.</p>`;
+    <canvas id="brain-volume" style="width:100%;height:clamp(260px,36vw,440px);touch-action:none;cursor:grab" aria-label="Rotatable transparent atlas with simulated activity on the right tectal neuropil"></canvas>
+    <p>Drag to rotate. Contours show forebrain (green), midbrain (blue), hindbrain (violet) and retinas (gray). Amber marks modeled tectal activity. The white ring follows the site selected on the map below.</p>`;
   document.querySelector('[aria-labelledby="tectal-heading"]').before(section);
   const canvas = section.querySelector("canvas");
   const angle = section.querySelector("#brain-angle");
+  const turn = section.querySelector("#brain-turn");
   const opacity = section.querySelector("#brain-opacity");
   const condition = section.querySelector("select");
   const layerColors = {forebrain:"#7ccfb0",midbrain:"#84c9ef",hindbrain:"#b9a8ed",retina:"#a8b3bc",neuropil:"#eccf91"};
@@ -25,11 +28,16 @@ const WholeBrain = (() => {
     const {projections, frame, selected, maxRate} = current;
     const p = projections[condition.selectedIndex];
     const {context:ctx,width,height} = sizeCanvas(canvas);
-    const a = Number(angle.value)*Math.PI/180;
-    const scale = Math.min((width-30)/974,(height-40)/600);
+    const radians = control => (Number(control.value) % 360) * Math.PI / 180;
+    const sinA = Math.sin(radians(angle)), cosA = Math.cos(radians(angle));
+    const sinT = Math.sin(radians(turn)), cosT = Math.cos(radians(turn));
+    section.querySelector("#turn-degrees").value = turn.value+"°";
+    section.querySelector("#tilt-degrees").value = angle.value+"°";
+    const scale = Math.min((width-30)/(974*Math.abs(cosT)+600*Math.abs(sinT)),
+      (height-40)/((600*Math.abs(cosT)+974*Math.abs(sinT))*Math.abs(cosA)+Math.abs(360*sinA)));
     const point = ([ap,dv,lr]) => [
-      width/2+(ap-475)*scale,
-      height/2+((lr-298)*Math.cos(a)+(dv-178)*Math.sin(a))*scale
+      width/2 + ((ap-475)*cosT+(lr-298)*sinT)*scale,
+      height/2 + (((lr-298)*cosT-(ap-475)*sinT)*cosA+(dv-178)*sinA)*scale
     ];
     ctx.clearRect(0,0,width,height);
     const alpha = Number(opacity.value)/100;
@@ -62,11 +70,29 @@ const WholeBrain = (() => {
     });
     ctx.globalAlpha=1;ctx.strokeStyle="white";ctx.lineWidth=1.5;
     const [x,y]=point(coordinates(selected)); ctx.beginPath();ctx.arc(x,y,5,0,2*Math.PI);ctx.stroke();
-    ctx.fillStyle="#d2deea";ctx.font="12px system-ui";ctx.fillText("Anterior",6,height-6);
-    ctx.fillText("Posterior",width-56,height-6);
+    ctx.fillStyle="#d2deea";ctx.font="12px system-ui";const [ax,ay]=point([45,178,298]), [px,py]=point([905,178,298]);
+    if(Math.hypot(px-ax,py-ay)>70){
+      ctx.textAlign="center";ctx.fillText("Anterior",ax,ay);ctx.fillText("Posterior",px,py);
+      ctx.textAlign="left";
+    }
     ctx.fillText(frame*Retina.dt+" ms",8,17);
   }
-  for(const el of [condition,angle,opacity])el.addEventListener("input",paint);
+  let drag;
+  canvas.onpointerdown = e => {
+    if (!e.isPrimary || e.button !== 0) return;
+    canvas.setPointerCapture(e.pointerId);
+    drag = {id:e.pointerId,x:e.clientX,y:e.clientY,turn:+turn.value,tilt:+angle.value};
+  };
+  canvas.onpointermove = e => {
+    if (!drag || drag.id !== e.pointerId) return;
+    const wrap = degrees => ((Math.round(degrees) % 360)+360)%360;
+    turn.value=wrap(drag.turn+(e.clientX-drag.x)*0.6);
+    angle.value=wrap(drag.tilt+(e.clientY-drag.y)*0.6);
+    paint();
+  };
+  canvas.onlostpointercapture = () => { drag=null; };
+  section.querySelector("#brain-reset").onclick=()=>{turn.value=0;angle.value=15;paint();};
+  for(const el of [condition,turn,angle,opacity])el.addEventListener("input",paint);
   function draw(projections,frame,selected,maxRate) {
     current={projections,frame,selected,maxRate};paint();
   }

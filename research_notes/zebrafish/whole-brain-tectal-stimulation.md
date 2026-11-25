@@ -13,3 +13,5 @@ The amber overlay comes from the existing 45-site or 561-site model. Modeled ant
 ## Verification
 
 ThinkStation3 generated the bundled geometry from the source masks. The model uses the same site index, time step, response values and amplitude scale for the brain overlay and the paired tectal maps. Browser checks exercised rotation, opacity, the wild-type and simulated synj1 overlays, and the switch back to the original spatial resolution. Rebuild offline geometry by running [build-brain-atlas.py](../../zebrafish-brain-fm/retina-simulation/build-brain-atlas.py) in the simulator directory with NumPy, Requests, numcodecs and scikit-image installed.
+
+The whole-brain view now supports full turns about two axes using mouse or touch drag, or the Turn and Tilt sliders. The site marker and activity use the same rotation as the atlas contours. Reset view restores the original 0° turn and 15° tilt. The paired retinal patches also rotate continuously with a shared drag gesture.
