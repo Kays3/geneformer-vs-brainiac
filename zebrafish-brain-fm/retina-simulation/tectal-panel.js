@@ -21,6 +21,7 @@ const TectalPanel = (() => {
     currentFrame = frame;
     const index = Number(site.value);
     const {columns,rows} = projections[0];
+    WholeBrain.draw(projections,frame,index,maxRate);
     maps.forEach((map,k) => {
       const {context:ctx,width,height} = sizeCanvas(map);
       const dx = width/columns, dy = (height-22)/rows;
